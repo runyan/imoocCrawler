@@ -84,7 +84,7 @@ public class ExcelUtil {
 			rowsInserted++;
 		}
 		String fileName = "courses.xls"; //Excel文件名
-		String storePath = getStorePath() + File.separator + fileName; //Excel文件存储路径
+		String storePath = getStorePath().concat(File.separator).concat(fileName); //Excel文件存储路径
 		try(FileOutputStream fos = new FileOutputStream(storePath)) {
 			workbook.write(fos); //将数据写入Excel文件
 		} catch (IOException e) {
