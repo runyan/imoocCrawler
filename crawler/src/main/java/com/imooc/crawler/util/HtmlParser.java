@@ -12,7 +12,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.imooc.crawler.entity.ImoocCourse;
-
+/**
+ * HTML解析类
+ * @author yanrun
+ *
+ */
 public class HtmlParser {
 	
 	private volatile static HtmlParser instance = null;
@@ -35,10 +39,19 @@ public class HtmlParser {
 		return instance;
 	}
 	
+	/**
+	 * 根据url获取HTML源码
+	 * @param url 目标url
+	 * @return HTML源码
+	 */
 	private String getHtmlString(String url) {
 		return HttpUtil.getInstance().sendHttpGet(url);
 	}
 	
+	/**
+	 * 解析HTML
+	 * @return
+	 */
 	public Map<String, Object> parse() {
 		Map<String, Object> resultMap = new HashMap<>();
 		Map<String, String> imgUrlMap = new HashMap<>();
@@ -91,6 +104,10 @@ public class HtmlParser {
 		return resultMap;
 	}
 	
+	/**
+	 * 解析HTML获取页数
+	 * @return 页数
+	 */
 	private int getTotalPageNum() {
 		try {
 			String lastPageHref = doc.select(".page a").last().attr("href");

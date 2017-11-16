@@ -2,14 +2,19 @@ package com.imooc.crawler.entity;
 
 import java.util.List;
 
+/**
+ * 慕课网课程实体类
+ * @author yanrun
+ *
+ */
 public class ImoocCourse {
 
-	private String imgSrc;
-	private String courseName;
-	private String courseLevel;
-	private List<String> courseLabels;
-	private String courseDesc;
-	private String studyNum;
+	private String imgSrc; //课程图片地址
+	private String courseName; //课程名称
+	private String courseLevel; //课程等级
+	private List<String> courseLabels; //课程标签
+	private String courseDesc; //课程简介
+	private String studyNum; //学习人数
 	
 	public ImoocCourse(String imgSrc, String courseName, String courseLevel,
 			List<String> courseLabels, String courseDesc, String studyNum) {

@@ -33,16 +33,27 @@ public class ExcelUtil {
 		return instance;
 	}
 	
+	/**
+	 * 创建存储的文件夹
+	 * @return 文件夹的路径
+	 */
 	private String getStorePath() {
 		return FileUtil.createDir(STORE_PATH);
 	}
 
+	/**
+	 * 保存到Excel
+	 * @param courses 要保存的课程列表
+	 * @return 
+	 * @throws IOException
+	 */
+	@SuppressWarnings("resource")
 	public boolean writeToExcel(List<ImoocCourse> courses) throws IOException {
 		int rowsInserted = 0;
-		HSSFWorkbook workbook = new HSSFWorkbook();
-		HSSFSheet sheet = workbook.createSheet();
-		HSSFRow headerRow = sheet.createRow(0);
-		HSSFCell cell = headerRow.createCell(0);
+		HSSFWorkbook workbook = new HSSFWorkbook(); //Excel工作簿
+		HSSFSheet sheet = workbook.createSheet(); //创建工作表
+		HSSFRow headerRow = sheet.createRow(0); //第一列，表头
+		HSSFCell cell = headerRow.createCell(0); //创表头建单元格，并填充内容
 		cell.setCellValue("课程名称");
 		cell = headerRow.createCell(1);
 		cell.setCellValue("课程图片URL");
@@ -54,8 +65,9 @@ public class ExcelUtil {
 		cell.setCellValue("课程简介");
 		cell = headerRow.createCell(5);
 		cell.setCellValue("学习人数");
-		HSSFRow contentRow;
+		HSSFRow contentRow; //内容行
 		ImoocCourse course;
+		//循环添加行
 		for(int i = 0; i < courses.size(); i++) {
 			contentRow = sheet.createRow(i + 1);
 			course = courses.get(i);
@@ -67,10 +79,10 @@ public class ExcelUtil {
 			contentRow.createCell(5).setCellValue(course.getStudyNum());
 			rowsInserted++;
 		}
-		String fileName = "courses.xls";
-		String storePath = getStorePath() + File.separator + fileName;
+		String fileName = "courses.xls"; //Excel文件名
+		String storePath = getStorePath() + File.separator + fileName; //Excel文件存储路径
 		FileOutputStream fos = new FileOutputStream(storePath);
-		workbook.write(fos);
+		workbook.write(fos); //将数据写入Excel文件
 		fos.close();
 		return rowsInserted == courses.size();
 	}

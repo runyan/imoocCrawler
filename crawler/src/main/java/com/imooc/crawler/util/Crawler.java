@@ -7,27 +7,45 @@ import java.util.Set;
 
 import com.imooc.crawler.entity.ImoocCourse;
 
+/**
+ * 爬虫类
+ * @author yanrun
+ *
+ */
 public class Crawler {
 	
 	private boolean needToDownloadImg;
 	private boolean needToStoreDataToExcel;
+	private boolean print;
 	private String imgPath;
 	private String excelStorePath;
 	
 	private Crawler(Builder builder) {
 		this.needToDownloadImg = builder.needToDownloadImg;
 		this.needToStoreDataToExcel = builder.needToStoreDataToExcel;
+		this.print = builder.print;
 		this.imgPath = builder.imgPath;
 		this.excelStorePath = builder.excelStorePath;
 	}
-	
+	/**
+	 * 爬取url的信息
+	 * @param targetUrl
+	 * @throws IOException
+	 */
 	@SuppressWarnings("unchecked")
 	public void crawImoocCourses(String targetUrl) throws IOException {
-		Map<String, Object> resultMap = HtmlParser.getInstance(targetUrl).parse();
+		Map<String, Object> resultMap = HtmlParser.getInstance(targetUrl).parse(); //获取解析结果
 		if(null == resultMap || resultMap.isEmpty()) {
 			System.out.println("没有获取到数据");
 			return ;
 		}
+		List<ImoocCourse> dataList = (List<ImoocCourse>) resultMap.get("data");
+		if(print) {
+			for(ImoocCourse course : dataList) {
+				System.out.println(course);
+			}
+		}
+		//如果需要下载图片则启动新线程进行下载
 		if(needToDownloadImg) {
 			if(null == imgPath) {
 				imgPath = "";
@@ -50,12 +68,12 @@ public class Crawler {
 				}
 			}).start();
 		}
+		//如果需要保存数据，则启动新线程进行保存
 		if(needToStoreDataToExcel) {
 			if(null == excelStorePath) {
 				excelStorePath = "";
 			}
 			new Thread(new Runnable() {
-				List<ImoocCourse> dataList = (List<ImoocCourse>) resultMap.get("data");
 				@Override
 				public void run() {
 					if(null == dataList || dataList.isEmpty()) {
@@ -75,11 +93,17 @@ public class Crawler {
 		}
 	}
 	
+	/**
+	 * 爬虫类的建造者
+	 * @author yanrun
+	 *
+	 */
 	public static class Builder {
-		private boolean needToDownloadImg;
-		private boolean needToStoreDataToExcel;
-		private String imgPath;
-		private String excelStorePath;
+		private boolean needToDownloadImg; //是否需要下载图片
+		private boolean needToStoreDataToExcel; //是否需要将数据保存到Excel
+		private boolean print = true; //是否需要打印数据
+		private String imgPath; //图片保存路径
+		private String excelStorePath; //Excel保存路径
 		
 		public Builder(){
 			super();
@@ -102,6 +126,11 @@ public class Crawler {
 		
 		public Builder excelStorePath(String excelStorePath) {
 			this.excelStorePath = excelStorePath;
+			return this;
+		}
+		
+		public Builder print(boolean print) {
+			this.print = print;
 			return this;
 		}
 		
