@@ -1,6 +1,5 @@
 package com.imooc.crawler.util;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +32,7 @@ public class Crawler {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	public void crawImoocCourses(String targetUrl) throws IOException {
+	public void crawImoocCourses(String targetUrl) {
 		Map<String, Object> resultMap = HtmlParser.getInstance(targetUrl).parse(); //获取解析结果
 		if(null == resultMap || resultMap.isEmpty()) {
 			System.out.println("没有获取到数据");
@@ -107,13 +106,8 @@ public class Crawler {
 						return ;
 					}
 					System.out.println("开始保存");
-					try {
-						boolean saveResult = ExcelUtil.getInstance(excelStorePath).writeToExcel(courseList);
-						System.out.println(saveResult ? "保存完成" : "保存失败");
-					} catch (IOException e) {
-						e.printStackTrace();
-						System.out.println("保存失败");
-					}
+					boolean saveResult = ExcelUtil.getInstance(excelStorePath).writeToExcel(courseList);
+					System.out.println(saveResult ? "保存完成" : "保存失败");
 				}
 			}).start();
 		}

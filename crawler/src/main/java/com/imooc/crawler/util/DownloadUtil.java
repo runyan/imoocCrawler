@@ -44,29 +44,48 @@ public class DownloadUtil {
 	 * @param imgUrl 图片地址
 	 */
 	public void downloadCourseImg(String courseName, String imgUrl) {
-		try {
-			String storeDirPath = createImgStorageDir();
-			String suffix = ".jpg"; //图片扩展名
-			courseName = courseName.replaceAll("\\\\", "").replaceAll(":", "").replaceAll("/", "")
-					.replaceAll("\\|", "").replaceAll("//*", "").replaceAll("//?", "")
-					.replaceAll("\"", "").replaceAll("<", "").replaceAll(">", ""); //去除课程名中的特殊字符
-			String imgPath = storeDirPath + courseName + suffix; //图片存储路径
+		String storeDirPath = createImgStorageDir();
+		String suffix = FileUtil.getFileExtName(imgUrl); //图片扩展名
+		if(null == suffix || suffix.isEmpty() || !FileUtil.isLegalImageExt(suffix)) {
+			suffix = ".jpg";
+		}
+		courseName = FileUtil.removeIlleagalCharactersInFileName(courseName); //去除课程名中的非法字符
+		String imageFileName = courseName.concat(suffix);
+		String imgPath = storeDirPath.concat(courseName).concat(suffix); //图片存储路径
+		doDownload(imgUrl, imageFileName, imgPath);
+	}
+	
+	/**
+	 * 执行下载
+	 * @param imgUrl 下载路径
+	 * @param imageFileName 文件名
+	 * @param storePath 存储路径
+	 */
+	private void doDownload(String imgUrl, String imageFileName, String storePath) {
+		InputStream inputStream = null;
+		try(OutputStream outputStream = new FileOutputStream(storePath)) {
 			URL downloadUrl = new URL(imgUrl);
 			HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection(); //打开连接
-            connection.setRequestProperty("User-Agent", Constraints.USER_AGENT); 
-            connection.setConnectTimeout(Constraints.TIME_OUT);
-            InputStream inputStream = connection.getInputStream();
+	        connection.setRequestProperty("User-Agent", Constraints.USER_AGENT); 
+	        connection.setConnectTimeout(Constraints.TIME_OUT);
+            inputStream = connection.getInputStream();
 			byte[] tmp = new byte[1024];
 			int length;
-			OutputStream outputStream = new FileOutputStream(imgPath);
             while((length = inputStream.read(tmp)) != -1) {
             	outputStream.write(tmp, 0, length); //写文件
             }
-            outputStream.close();
-            inputStream.close();
-			System.out.println("已下载:" + courseName + suffix);
 		} catch(Exception e) {
 			e.printStackTrace();
+			System.err.append(imageFileName + "下载失败").println();
+		} finally {
+			try {
+				if(null != inputStream) {
+					inputStream.close();
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
+		System.out.println("已下载:" + imageFileName);
 	}
 }

@@ -76,24 +76,29 @@ public class HtmlParser {
 		String studyNum;
 		String immocURL = "http://www.imooc.com";
 		ImoocCourse c;
+		String htmlStr;
 		for(int pageNum = 1; pageNum <= totalPages; pageNum++) {
 			System.out.println("正在处理第" + pageNum + "页,还有" + (totalPages - pageNum) + "页");
 			urlBuilder = urlBuilder.append(pageNum);
 			if(pageNum >= 2) {
-				doc = Jsoup.parse(getHtmlString(urlBuilder.toString()));
+				htmlStr = getHtmlString(urlBuilder.toString());
+				if(htmlStr.isEmpty()) {
+					continue;
+				}
+				doc = Jsoup.parse(htmlStr);
 			}
-			courseItems = doc.getElementsByClass("container").select("div .course-card-container");
+			courseItems = doc.select(".container div .course-card-container");
 			for(Element course : courseItems) {
 				courseLabels = new ArrayList<>();
-				imgSrc = "http:" + course.getElementsByTag("img").attr("src");
-				lableElements = course.getElementsByClass("course-label").select("label");
+				imgSrc = "http:".concat(course.getElementsByTag("img").attr("src"));
+				lableElements = course.select(".course-label label");
 				for(Element label : lableElements) {
 					courseLabel = label.text();
 					courseLabels.add(courseLabel);
 				}
 				courseName = course.getElementsByClass("course-card-name").text();
 				courseURL = immocURL.concat(course.select(".course-card").attr("href"));
-				courseInfoElements = course.getElementsByClass("course-card-info").select("span");
+				courseInfoElements = course.select(".course-card-info span");
 				courseLevel = courseInfoElements.get(0).text();
 				studyNum = courseInfoElements.get(1).text();
 				courseDesc = course.getElementsByClass("course-card-desc").text();

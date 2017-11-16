@@ -48,7 +48,7 @@ public class ExcelUtil {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("resource")
-	public boolean writeToExcel(List<ImoocCourse> courses) throws IOException {
+	public boolean writeToExcel(List<ImoocCourse> courses) {
 		int rowsInserted = 0;
 		HSSFWorkbook workbook = new HSSFWorkbook(); //Excel工作簿
 		HSSFSheet sheet = workbook.createSheet(); //创建工作表
@@ -69,8 +69,9 @@ public class ExcelUtil {
 		cell.setCellValue("课程连接");
 		HSSFRow contentRow; //内容行
 		ImoocCourse course;
+		int courseLength = courses.size();
 		//循环添加行
-		for(int i = 0; i < courses.size(); i++) {
+		for(int i = 0; i < courseLength; i++) {
 			contentRow = sheet.createRow(i + 1);
 			course = courses.get(i);
 			contentRow.createCell(0).setCellValue(course.getCourseName());
@@ -84,9 +85,12 @@ public class ExcelUtil {
 		}
 		String fileName = "courses.xls"; //Excel文件名
 		String storePath = getStorePath() + File.separator + fileName; //Excel文件存储路径
-		FileOutputStream fos = new FileOutputStream(storePath);
-		workbook.write(fos); //将数据写入Excel文件
-		fos.close();
-		return rowsInserted == courses.size();
+		try(FileOutputStream fos = new FileOutputStream(storePath)) {
+			workbook.write(fos); //将数据写入Excel文件
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return rowsInserted == courseLength;
 	}
 }

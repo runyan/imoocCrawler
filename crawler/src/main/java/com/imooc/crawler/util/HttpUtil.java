@@ -39,23 +39,19 @@ public class HttpUtil {
 
 	private String sendHttpGet(HttpGet httpGet) {
 		CloseableHttpClient httpClient = null;
-		CloseableHttpResponse response = null;
 		HttpEntity entity = null;
 		String responseContent = null;
-		try {
-			httpClient = HttpClients.createDefault();
-			httpGet.setConfig(requestConfig);
-			httpGet.setHeader("User-Agent", Constraints.USER_AGENT);
-			response = httpClient.execute(httpGet);
+		httpClient = HttpClients.createDefault();
+		httpGet.setConfig(requestConfig);
+		httpGet.setHeader("User-Agent", Constraints.USER_AGENT);
+		try(CloseableHttpResponse response = httpClient.execute(httpGet)) {
 			entity = response.getEntity();
 			responseContent = EntityUtils.toString(entity, "UTF-8");
 		} catch(Exception e) {
 			e.printStackTrace();
+			return "";
 		} finally {
 			try {
-				if(null != response) {
-					response.close();
-				}
 				if(null != httpClient) {
 					httpClient.close();
 				}
