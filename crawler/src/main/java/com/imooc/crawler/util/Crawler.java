@@ -39,19 +39,39 @@ public class Crawler {
 			System.out.println("没有获取到数据");
 			return ;
 		}
-		List<ImoocCourse> dataList = (List<ImoocCourse>) resultMap.get("data");
+		Map<String, String> courseImgUrlMap = (Map<String, String>) resultMap.get("imgUrlMap");
+		List<ImoocCourse> courseList = (List<ImoocCourse>) resultMap.get("data");
+		printCourseInfo(courseList);
+		//如果需要下载图片则启动新线程进行下载
+		downloadImgs(courseImgUrlMap);
+		//如果需要保存数据，则启动新线程进行保存
+		saveDataToExcel(courseList);
+	}
+	
+	/**
+	 * 打印课程信息
+	 * @param print 是否需要打印
+	 * @param courseList 课程列表
+	 */
+	private void printCourseInfo(List<ImoocCourse> courseList) {
 		if(print) {
-			for(ImoocCourse course : dataList) {
+			for(ImoocCourse course : courseList) {
 				System.out.println(course);
 			}
 		}
-		//如果需要下载图片则启动新线程进行下载
+	}
+	
+	/**
+	 * 下载图片
+	 * @param needToDownloadImg 是否需要下载图片
+	 * @param imgUrlMap 图片url集合
+	 */
+	private void downloadImgs(Map<String, String> imgUrlMap) {
 		if(needToDownloadImg) {
 			if(null == imgPath) {
 				imgPath = "";
 			}
 			new Thread(new Runnable() {
-				Map<String, String> imgUrlMap = (Map<String, String>) resultMap.get("imgUrlMap");
 				@Override
 				public void run() {
 					if(null == imgUrlMap || imgUrlMap.isEmpty()) {
@@ -68,7 +88,13 @@ public class Crawler {
 				}
 			}).start();
 		}
-		//如果需要保存数据，则启动新线程进行保存
+	}
+	
+	/**
+	 * 将数据保存到Excel
+	 * @param courseList 课程列表
+	 */
+	private void saveDataToExcel(List<ImoocCourse> courseList) {
 		if(needToStoreDataToExcel) {
 			if(null == excelStorePath) {
 				excelStorePath = "";
@@ -76,18 +102,18 @@ public class Crawler {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					if(null == dataList || dataList.isEmpty()) {
+					if(null == courseList || courseList.isEmpty()) {
 						System.out.println("没有可以保存的数据");
 						return ;
 					}
 					System.out.println("开始保存");
 					try {
-						ExcelUtil.getInstance(excelStorePath).writeToExcel(dataList);
+						boolean saveResult = ExcelUtil.getInstance(excelStorePath).writeToExcel(courseList);
+						System.out.println(saveResult ? "保存完成" : "保存失败");
 					} catch (IOException e) {
 						e.printStackTrace();
 						System.out.println("保存失败");
 					}
-					System.out.println("保存完成");
 				}
 			}).start();
 		}
