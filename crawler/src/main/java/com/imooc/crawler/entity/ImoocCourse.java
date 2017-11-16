@@ -10,6 +10,7 @@ import java.util.List;
 public class ImoocCourse {
 
 	private String imgSrc; //课程图片地址
+	private String courseURL; //课程连接
 	private String courseName; //课程名称
 	private String courseLevel; //课程等级
 	private List<String> courseLabels; //课程标签
@@ -17,7 +18,7 @@ public class ImoocCourse {
 	private String studyNum; //学习人数
 	
 	public ImoocCourse(String imgSrc, String courseName, String courseLevel,
-			List<String> courseLabels, String courseDesc, String studyNum) {
+			List<String> courseLabels, String courseDesc, String studyNum, String courseURL) {
 		super();
 		this.imgSrc = imgSrc;
 		this.courseName = courseName;
@@ -25,6 +26,7 @@ public class ImoocCourse {
 		this.courseLabels = courseLabels;
 		this.courseDesc = courseDesc;
 		this.studyNum = studyNum;
+		this.courseURL = courseURL;
 	}
 	
 	public String getImgSrc() {
@@ -75,13 +77,20 @@ public class ImoocCourse {
 		this.studyNum = studyNum;
 	}
 
+	public String getCourseURL() {
+		return courseURL;
+	}
+
+	public void setCourseURL(String courseURL) {
+		this.courseURL = courseURL;
+	}
+
 	@Override
 	public String toString() {
-		return "ImoocCourse [imgSrc=" + imgSrc + ", courseName=" + courseName
-				+ ", courseLevel=" + courseLevel + ", courseLabels="
-				+ courseLabels + ", courseDesc=" + courseDesc + ", studyNum="
-				+ studyNum + "]";
+		return "ImoocCourse [imgSrc=" + imgSrc + ", courseURL=" + courseURL
+				+ ", courseName=" + courseName + ", courseLevel=" + courseLevel
+				+ ", courseLabels=" + courseLabels + ", courseDesc="
+				+ courseDesc + ", studyNum=" + studyNum + "]";
 	}
-	
-	
+
 }

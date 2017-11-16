@@ -65,6 +65,8 @@ public class ExcelUtil {
 		cell.setCellValue("课程简介");
 		cell = headerRow.createCell(5);
 		cell.setCellValue("学习人数");
+		cell = headerRow.createCell(6);
+		cell.setCellValue("课程连接");
 		HSSFRow contentRow; //内容行
 		ImoocCourse course;
 		//循环添加行
@@ -77,6 +79,7 @@ public class ExcelUtil {
 			contentRow.createCell(3).setCellValue(course.getCourseLabels().toString().replaceAll("\\[", "").replaceAll("\\]", ""));
 			contentRow.createCell(4).setCellValue(course.getCourseDesc());
 			contentRow.createCell(5).setCellValue(course.getStudyNum());
+			contentRow.createCell(6).setCellValue(course.getCourseURL());
 			rowsInserted++;
 		}
 		String fileName = "courses.xls"; //Excel文件名
