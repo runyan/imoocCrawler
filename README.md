@@ -1,10 +1,10 @@
 # imoocCrawler
-使用jSoup和httpClient从慕课网上爬取java课程信息
+使用jSoup和httpClient从慕课网上爬取java课程信息，将数据保存到Excel文档中并下载课程图片
 
 
 ## License
 ```
-Copyright (C)  Orange Cat Technologies
+Copyright(C) 2017 Orange Cat Technologies
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
