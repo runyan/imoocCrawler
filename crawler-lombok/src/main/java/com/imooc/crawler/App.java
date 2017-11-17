@@ -6,7 +6,8 @@ public class App {
     public static void main( String[] args ) throws IOException {
     	Crawler.Builder crawlerBuilder = new Crawler.Builder();
     	Crawler crawler = crawlerBuilder
-    			.needToDownloadImg(true)
+    			.print(false)
+    			.needToDownloadImg(false)
     			.imgPath("D://photos//imooc//")
     			.needToStoreDataToExcel(true)
     			.excelStorePath("D://")

@@ -1,10 +1,11 @@
 package com.imooc.crawler.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -53,9 +54,10 @@ public class HtmlParser {
 	 * @return 解析获得的数据
 	 */
 	public Map<String, Object> parse() {
-		Map<String, Object> resultMap = new HashMap<>();
-		Map<String, String> imgUrlMap = new HashMap<>();
-		List<ImoocCourse> resultList = new LinkedList<>();
+		Map<String, Object> resultMap = new ConcurrentHashMap<>();
+		Map<String, String> imgUrlMap = new ConcurrentHashMap<>();
+		List<ImoocCourse> courseList = new LinkedList<>();
+		courseList = Collections.synchronizedList(courseList);
 		int pageIndex = getLastEqualsIndex(TARGET_URL);
 		String fixedCourseUrl = TARGET_URL.substring(0, pageIndex); //获取不变的URL
 		int totalPages = getTotalPageNum();
@@ -103,12 +105,12 @@ public class HtmlParser {
 				studyNum = courseInfoElements.get(1).text();
 				courseDesc = course.getElementsByClass("course-card-desc").text();
 				c = new ImoocCourse(imgSrc, courseURL, courseName, courseLevel, courseLabels, courseDesc, studyNum); 
-				resultList.add(c);
+				courseList.add(c);
 				imgUrlMap.put(courseName, imgSrc);
 			}
 			urlBuilder.delete(pageIndex, urlBuilder.length());
 		}
-		resultMap.put("data", resultList);
+		resultMap.put("data", courseList);
 		resultMap.put("imgUrlMap", imgUrlMap);
 		System.out.println("获取数据完成");
 		return resultMap;
@@ -129,7 +131,10 @@ public class HtmlParser {
 	 */
 	private int getTotalPageNum() {
 		try {
-			String lastPageHref = doc.select(".page a").last().attr("href");
+			Element lastPageElement = doc.select(".page a").last();
+			lastPageElement.getElementsByClass("active text-page-tag");
+			String lastPageHref = (lastPageElement.getElementsByClass("active text-page-tag").size() == 0) 
+					? doc.select(".page a").last().attr("href") : lastPageElement.text();
 			return Integer.parseInt(lastPageHref.substring(getLastEqualsIndex(lastPageHref)));
 		} catch(Exception e) {
 			e.printStackTrace();

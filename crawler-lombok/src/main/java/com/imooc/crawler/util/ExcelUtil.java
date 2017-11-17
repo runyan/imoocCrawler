@@ -1,6 +1,5 @@
 package com.imooc.crawler.util;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -111,7 +110,7 @@ public class ExcelUtil {
 			contentRow.createCell(6).setCellValue(course.getCourseURL());
 		}
 		String fileName = "courses.xls"; //Excel文件名
-		String storePath = getStorePath().concat(File.separator).concat(fileName); //Excel文件存储路径
+		String storePath = getStorePath().concat(fileName); //Excel文件存储路径
 		try {
 			@Cleanup FileOutputStream fos = new FileOutputStream(storePath);
 			workBook.write(fos); //将数据写入Excel文件
