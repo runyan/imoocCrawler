@@ -9,16 +9,20 @@ import java.util.Arrays;
  *
  */
 public class FileUtil {
+
+	private static final String SEPARATOR = File.separator;
+
 	/**
 	 * 创建文件夹
 	 * @param insertedPath 用户输入的路径
 	 * @return 路径
 	 */
 	public static String createDir(String insertedPath) {
-		String path = (null == insertedPath || insertedPath.isEmpty()) ? generateDirPath(insertedPath) : insertedPath; //获取文件夹路径
+		String path = (null == insertedPath || insertedPath.isEmpty()) ? generateDefaultDirPath(insertedPath)
+                : insertedPath; //获取文件夹路径
 		File dir = new File(path);
 		if(!dir.exists()) {
-			boolean createDirSuccessfully = dir.mkdir(); //获取创建结果
+			boolean createDirSuccessfully = dir.mkdirs(); //获取创建结果
 			if(!createDirSuccessfully) {
 				throw new RuntimeException("创建文件夹" + path + "失败");
 			}
@@ -31,20 +35,19 @@ public class FileUtil {
 	 * @param insertedPath 用户输入的路径
 	 * @return 路径
 	 */
-	private static String generateDirPath(String insertedPath) {
+	private static String generateDefaultDirPath(String insertedPath) {
 		if(null != insertedPath && !insertedPath.isEmpty()) {
 			return insertedPath;
 		}
 		String rootPath;
-		String pathSeparator = File.separator;
 		if(OSUtil.isWindows()) {
-			rootPath = "D:".concat(pathSeparator);
+			rootPath = "D:".concat(SEPARATOR);
 		} else if(OSUtil.isLinux() || OSUtil.isMacOS()) {
-			rootPath = pathSeparator.concat("usr").concat(pathSeparator).concat("home").concat(pathSeparator);
+			rootPath = SEPARATOR.concat("usr").concat(SEPARATOR).concat("home").concat(SEPARATOR);
 		} else {
 			throw new RuntimeException("暂不支持的操作系统");
 		}
-		String storeDirPath = "imoocCrawler".concat(pathSeparator);
+		String storeDirPath = "imoocCrawler".concat(SEPARATOR);
 		return rootPath.concat(storeDirPath);
 	}
 	

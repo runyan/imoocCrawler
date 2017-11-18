@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import lombok.Cleanup;
 /**
  * 下载工具类
  * @author yanrun
@@ -14,7 +16,6 @@ import java.net.URL;
 public class DownloadUtil {
 	
 	private final String INSERTED_IMG_STORE_PATH;
-	private static volatile DownloadUtil instance;
 	private final int DOWNLOAD_THREAD_COUNT = 3; //下载线程数
 	
 	private DownloadUtil(String storeDir) {
@@ -22,14 +23,7 @@ public class DownloadUtil {
 	}
 	
 	public static DownloadUtil getInstance(String storeDir) {
-		if(null == instance) {
-			synchronized (DownloadUtil.class) {
-				if(null == instance) {
-					instance = new DownloadUtil(storeDir);
-				}
-			}
-		}
-		return instance;
+		return new DownloadUtil(storeDir);
 	}
 	
 	/**
@@ -133,11 +127,10 @@ public class DownloadUtil {
 
 		@Override
 		public void run() {
-			InputStream inputStream = null;
 			HttpURLConnection conn = null;
 			try {
 				conn = getConnectionByUrl(downloadUrl);
-		        inputStream = conn.getInputStream();
+				@Cleanup InputStream inputStream = conn.getInputStream();
 		        inputStream.skip(startPos); //跳过startPos个字节，表明该线程只下载自己负责哪部分文件
 		        byte[] buffer = new byte[1024];
 		        int hasRead = 0;
@@ -152,9 +145,6 @@ public class DownloadUtil {
 			} finally {
 				try {
 					currentPart.close();
-					if(null != inputStream) {
-						inputStream.close();
-					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

@@ -1,6 +1,6 @@
 package com.imooc.crawler.util;
 
-import java.io.IOException;
+import lombok.Cleanup;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -38,27 +38,18 @@ public class HttpUtil {
 	}
 
 	private String sendHttpGet(HttpGet httpGet) {
-		CloseableHttpClient httpClient = null;
-		HttpEntity entity = null;
 		String responseContent = null;
-		httpClient = HttpClients.createDefault();
 		httpGet.setConfig(requestConfig);
 		httpGet.setHeader("User-Agent", Constraints.USER_AGENT);
-		try(CloseableHttpResponse response = httpClient.execute(httpGet)) {
-			entity = response.getEntity();
+		try {
+			@Cleanup CloseableHttpClient httpClient = HttpClients.createDefault();
+			@Cleanup CloseableHttpResponse response = httpClient.execute(httpGet);
+			HttpEntity entity = response.getEntity();
 			responseContent = EntityUtils.toString(entity, "UTF-8");
 		} catch(Exception e) {
 			e.printStackTrace();
 			return "";
-		} finally {
-			try {
-				if(null != httpClient) {
-					httpClient.close();
-				}
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-		}
+		} 
 		return responseContent;
 	}
 

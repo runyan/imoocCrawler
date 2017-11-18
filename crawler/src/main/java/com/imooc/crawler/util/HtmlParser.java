@@ -1,10 +1,11 @@
 package com.imooc.crawler.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -50,14 +51,15 @@ public class HtmlParser {
 	
 	/**
 	 * 解析HTML
-	 * @return
+	 * @return 解析获得的数据
 	 */
 	public Map<String, Object> parse() {
-		Map<String, Object> resultMap = new HashMap<>();
-		Map<String, String> imgUrlMap = new HashMap<>();
-		List<ImoocCourse> resultList = new LinkedList<>();
+		Map<String, Object> resultMap = new ConcurrentHashMap<>();
+		Map<String, String> imgUrlMap = new ConcurrentHashMap<>();
+		List<ImoocCourse> courseList = new LinkedList<>();
+		courseList = Collections.synchronizedList(courseList);
 		int pageIndex = getLastEqualsIndex(TARGET_URL);
-		String fixedCourseUrl = TARGET_URL.substring(0, pageIndex);
+		String fixedCourseUrl = TARGET_URL.substring(0, pageIndex); //获取不变的URL
 		int totalPages = getTotalPageNum();
 		if(totalPages == 0) {
 			return resultMap;
@@ -102,18 +104,23 @@ public class HtmlParser {
 				courseLevel = courseInfoElements.get(0).text();
 				studyNum = courseInfoElements.get(1).text();
 				courseDesc = course.getElementsByClass("course-card-desc").text();
-				c = new ImoocCourse(imgSrc, courseName, courseLevel, courseLabels, courseDesc, studyNum, courseURL); 
-				resultList.add(c);
+				c = new ImoocCourse(imgSrc, courseURL, courseName, courseLevel, courseLabels, courseDesc, studyNum); 
+				courseList.add(c);
 				imgUrlMap.put(courseName, imgSrc);
 			}
 			urlBuilder.delete(pageIndex, urlBuilder.length());
 		}
-		resultMap.put("data", resultList);
+		resultMap.put("data", courseList);
 		resultMap.put("imgUrlMap", imgUrlMap);
 		System.out.println("获取数据完成");
 		return resultMap;
 	}
 	
+	/**
+	 * 获取最后一个等号的位置
+	 * @param str 源字符串
+	 * @return 最后一个等号的位置
+	 */
 	private int getLastEqualsIndex(String str) {
 		return str.lastIndexOf("=") + 1;
 	}
@@ -124,7 +131,10 @@ public class HtmlParser {
 	 */
 	private int getTotalPageNum() {
 		try {
-			String lastPageHref = doc.select(".page a").last().attr("href");
+			Element lastPageElement = doc.select(".page a").last();
+			lastPageElement.getElementsByClass("active text-page-tag");
+			String lastPageHref = (lastPageElement.getElementsByClass("active text-page-tag").size() == 0) 
+					? doc.select(".page a").last().attr("href") : lastPageElement.text();
 			return Integer.parseInt(lastPageHref.substring(getLastEqualsIndex(lastPageHref)));
 		} catch(Exception e) {
 			e.printStackTrace();
