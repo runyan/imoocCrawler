@@ -21,7 +21,7 @@ public class FileUtil {
 	 * @return 路径
 	 */
 	public static String createDir(String insertedPath) {
-		String path = (null == insertedPath || insertedPath.isEmpty()) ? generateDefaultDirPath(insertedPath)
+		String path = (null == insertedPath || insertedPath.isEmpty()) ? generateDefaultDirPath()
                 : parseInsertedPath(insertedPath); //获取文件夹路径
 		File dir = new File(path);
 		if(!dir.exists()) {
@@ -34,11 +34,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * 根据操作系统获得存储路径
-	 * @param insertedPath 用户输入的路径
-	 * @return 路径
+	 * 根据操作系统生成存储路径
+	 * @return 自动生成的路径
 	 */
-	private static String generateDefaultDirPath(String insertedPath) {
+	private static String generateDefaultDirPath() {
 		String rootPath;
 		if(OSUtil.isWindows()) {
 			rootPath = "D:".concat(SEPARATOR);
