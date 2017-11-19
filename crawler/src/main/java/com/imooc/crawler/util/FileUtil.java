@@ -3,6 +3,9 @@ package com.imooc.crawler.util;
 import java.io.File;
 import java.util.Arrays;
 
+import org.apache.commons.text.StringEscapeUtils;
+
+
 /**
  * 文件工具类
  * @author yanrun
@@ -19,7 +22,7 @@ public class FileUtil {
 	 */
 	public static String createDir(String insertedPath) {
 		String path = (null == insertedPath || insertedPath.isEmpty()) ? generateDefaultDirPath(insertedPath)
-                : insertedPath; //获取文件夹路径
+                : parseInsertedPath(insertedPath); //获取文件夹路径
 		File dir = new File(path);
 		if(!dir.exists()) {
 			boolean createDirSuccessfully = dir.mkdirs(); //获取创建结果
@@ -36,20 +39,47 @@ public class FileUtil {
 	 * @return 路径
 	 */
 	private static String generateDefaultDirPath(String insertedPath) {
-		if(null != insertedPath && !insertedPath.isEmpty()) {
-			return insertedPath;
-		}
 		String rootPath;
 		if(OSUtil.isWindows()) {
 			rootPath = "D:".concat(SEPARATOR);
 		} else if(OSUtil.isLinux() || OSUtil.isMacOS()) {
-			rootPath = SEPARATOR.concat("usr").concat(SEPARATOR).concat("home").concat(SEPARATOR);
+			rootPath = SEPARATOR.concat("usr").concat(SEPARATOR)
+					.concat("home").concat(SEPARATOR);
 		} else {
 			throw new RuntimeException("暂不支持的操作系统");
 		}
 		String storeDirPath = "imoocCrawler".concat(SEPARATOR);
 		return rootPath.concat(storeDirPath);
 	}
+	
+	/**
+	 * 对输入的文件路径进行处理
+	 * @param insertedPath 输入的文件路径
+	 * @return 处理后的文件路径 例：输入D:/123,输出d:/123/
+	 */
+	private static String parseInsertedPath(String insertedPath) {
+		insertedPath = StringEscapeUtils.escapeJava(insertedPath); //对转义字符进行反转义处理
+		//如果以/,//,\,\\结尾则不做处理
+		if(insertedPath.endsWith("/") ||insertedPath.endsWith("\\\\")
+				|| insertedPath.endsWith("\\")
+				|| insertedPath.endsWith("//")) {
+			return insertedPath;
+		}
+		if(insertedPath.contains("//")) {
+			return insertedPath.concat("//");
+		}
+		if(insertedPath.contains("/")) {
+			return insertedPath.concat("/");
+		}
+		if(insertedPath.contains("\\\\")) {
+			return insertedPath.concat("\\\\");
+		}
+		if(insertedPath.contains("\\")) {
+			return insertedPath.concat("\\");
+		}
+		throw new RuntimeException("非法的路径格式");
+	}
+	
 	
 	/**
 	 * 移除文件名中的非法字符

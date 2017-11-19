@@ -102,7 +102,6 @@ public class Crawler {
 				excelStorePath = "";
 			}
 			new Thread(new Runnable() {
-				ExcelUtil util = ExcelUtil.getInstance(excelStorePath);
 				@Override
 				public void run() {
 					if(null == courseList || courseList.isEmpty()) {
@@ -110,7 +109,8 @@ public class Crawler {
 						return ;
 					}
 					System.out.println("开始保存");
-					boolean saveResult = util.writeToExcel(courseList);
+					boolean saveResult = ExcelUtil.getInstance(excelStorePath)
+							.writeToExcel(courseList);
 					System.out.println(saveResult ? "保存完成" : "保存失败");
 				}
 			}).start();
