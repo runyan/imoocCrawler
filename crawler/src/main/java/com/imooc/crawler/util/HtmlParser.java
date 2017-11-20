@@ -51,6 +51,7 @@ public class HtmlParser {
 	 * @return URL是否为慕课网的URL
 	 */
 	private static boolean checkHost(String targetUrl) {
+		targetUrl = StringUtils.lowerCase(targetUrl);
 		String host;
 		String path;
 		if(!StringUtils.startsWithIgnoreCase(targetUrl, "http://") && !StringUtils.startsWithIgnoreCase(targetUrl, "https://")) {
@@ -65,7 +66,7 @@ public class HtmlParser {
 			e.printStackTrace();
 			return false;
 		}
-		return StringUtils.contains(StringUtils.lowerCase(host), "imooc.com") && StringUtils.contains(StringUtils.lowerCase(path), "course/list");
+		return StringUtils.contains(host, "imooc.com") && StringUtils.contains(path, "course/list");
 	}
 	
 	/**
