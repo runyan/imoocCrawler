@@ -9,7 +9,7 @@ public class App {
     			.print(false)
     			.needToDownloadImg(false)
     			.imgPath("D://photos//imooc")
-    			.needToStoreDataToExcel(true)
+    			.needToStoreDataToExcel(false)
     			.downloadImageThreadNum(5)
     			.excelFileName("courses")
     			.build();

@@ -47,23 +47,25 @@ public class HtmlParser {
 	
 	/**
 	 * 检查传入的URL是否为慕课网的URL
-	 * @param url 要检测的URL
+	 * @param targetUrl 要检测的URL
 	 * @return URL是否为慕课网的URL
 	 */
-	private static boolean checkHost(String url) {
+	private static boolean checkHost(String targetUrl) {
 		String host;
-		if(!StringUtils.startsWithIgnoreCase(url, "http://") && !StringUtils.startsWithIgnoreCase(url, "https://")) {
-			url = "http://".concat(url);
+		String path;
+		if(!StringUtils.startsWithIgnoreCase(targetUrl, "http://") && !StringUtils.startsWithIgnoreCase(targetUrl, "https://")) {
+			targetUrl = "http://".concat(targetUrl);
 		}
 		try {
-			URL uri = new URL(url);
-			host = uri.getHost();
+			URL url = new URL(targetUrl);
+			host = url.getHost();
+			path = url.getPath();
 		} catch(Exception e) {
 			System.err.append("非法的URL").println();
 			e.printStackTrace();
 			return false;
 		}
-		return StringUtils.contains(StringUtils.lowerCase(host), "imooc.com");
+		return StringUtils.contains(StringUtils.lowerCase(host), "imooc.com") && StringUtils.contains(StringUtils.lowerCase(path), "course/list");
 	}
 	
 	/**
