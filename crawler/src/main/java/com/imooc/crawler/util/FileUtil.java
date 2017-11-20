@@ -43,8 +43,7 @@ public class FileUtil {
 		if(OSUtil.isWindows()) {
 			rootPath = "D:".concat(SEPARATOR);
 		} else if(OSUtil.isLinux() || OSUtil.isMacOS()) {
-			rootPath = SEPARATOR.concat("usr").concat(SEPARATOR)
-					.concat("home").concat(SEPARATOR);
+			rootPath = System.getProperty("user.dir").concat(SEPARATOR);
 		} else {
 			throw new RuntimeException("暂不支持的操作系统");
 		}
@@ -87,7 +86,7 @@ public class FileUtil {
 	 * @return 处理后的文件名
 	 */
 	public static String removeIlleagalCharactersInFileName(String fileName) {
-		return StringUtils.replaceAll(fileName.toLowerCase().trim(), "[\\\\:/\\|//*//?\\<>\"]", "")
+		return StringUtils.replaceAll(StringUtils.lowerCase(fileName).trim(), "[\\\\:/\\|//*//?\\<>\"]", "")
 				.replaceAll("con", "").replaceAll("prn", "").replaceAll("aux", "").replaceAll("clock$", "")
 				.replaceAll("nul", "").replaceAll("com1", "").replaceAll("com2", "").replaceAll("com3", "")
 				.replaceAll("com4", "").replaceAll("com5", "").replaceAll("com6", "").replaceAll("com7", "")
@@ -99,7 +98,8 @@ public class FileUtil {
 	 * @param fileName 文件名
 	 * @return 文件的扩展名，带.
 	 */
-	public static String getFileExtName(String fileName) {
+	public static String getFileExt(String fileName) {
+		fileName = StringUtils.lowerCase(fileName);
 		int lastDotIndex = StringUtils.lastIndexOf(fileName, ".");
 		return (lastDotIndex >= 0) ? StringUtils.substring(fileName, lastDotIndex) : "";
 	}
@@ -111,6 +111,24 @@ public class FileUtil {
 	 */
 	public static boolean isLegalImageExt(String ext) {
 		String[] legalExtArr = {".bmp", ".jpg", ".png", ".tiff", ".gif", ".exif", ".webp"};
-		return Arrays.asList(legalExtArr).contains(ext);
+		return Arrays.asList(legalExtArr).contains(StringUtils.lowerCase(ext));
+	}
+	
+	/**
+	 * 对传入的Excel文件名进行处理，将不是.xls扩展名的文件扩展名修改为.xls
+	 * @param excelFileName 传入的Excel文件名
+	 * @return 处理后的Excel文件名
+	 */
+	public static String parseExcelExt(String excelFileName) {
+		String fileExt = getFileExt(excelFileName);
+		String xlsx = ".xlsx";
+		String xls = ".xls";
+		if(StringUtils.equalsIgnoreCase(fileExt, xlsx)) {
+			return StringUtils.replace(excelFileName, xlsx, xls);
+		}else if(StringUtils.equalsIgnoreCase(fileExt, xls)) {
+			return excelFileName;
+		} else {
+			return StringUtils.replace(excelFileName, fileExt, xls);
+		}
 	}
 }

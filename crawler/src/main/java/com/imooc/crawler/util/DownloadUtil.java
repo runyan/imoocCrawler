@@ -71,7 +71,7 @@ public class DownloadUtil {
 	 */
 	public void downloadCourseImg(String courseName, String imgUrl) {
 		String storeDirPath = createImgStorageDir(); //课程图片存储路径
-		String suffix = FileUtil.getFileExtName(imgUrl); //图片扩展名
+		String suffix = FileUtil.getFileExt(imgUrl); //图片扩展名
 		if(StringUtils.isEmpty(suffix) || !FileUtil.isLegalImageExt(suffix)) {
 			suffix = ".jpg";
 		}

@@ -17,16 +17,18 @@ public class ExcelUtil {
 	private final String STORE_PATH;
 	private HSSFWorkbook workBook; //Excel工作簿
 	private HSSFSheet workSheet; //Excel工作表
-	private final String EXCEL_FILE_NAME = "courses.xls"; //Excel文件名
+	private final String DEFAULT_EXCEL_FILE_NAME = "courses.xls"; //默认Excel文件名
+	private String excelFileName;
 	
-	private ExcelUtil(String storeDir){
+	private ExcelUtil(String storeDir, String excelFileName){
 		this.STORE_PATH = storeDir;
+		this.excelFileName = (StringUtils.isEmpty(excelFileName)) ? DEFAULT_EXCEL_FILE_NAME : FileUtil.parseExcelExt(excelFileName);
 		this.workBook = createWorkBook();
 		this.workSheet = createWorkSheetAndAddHeader();
 	}
 	
-	public static ExcelUtil getInstance(String storeDir) {
-		return new ExcelUtil(storeDir);
+	public static ExcelUtil getInstance(String storeDir, String excelFileName) {
+		return new ExcelUtil(storeDir, excelFileName);
 	}
 	
 	/**
@@ -42,7 +44,7 @@ public class ExcelUtil {
 	 * @return Excel文件
 	 */
 	private File getExcelFile() {
-		String excelFilePath = getStorePath().concat(EXCEL_FILE_NAME);
+		String excelFilePath = getStorePath().concat(excelFileName);
 		return new File(excelFilePath);
 	}
 

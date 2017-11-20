@@ -22,6 +22,7 @@ public class Crawler {
 	private String imgPath;
 	private String excelStorePath;
 	private int downloadImageThreadNum;
+	private String excelFileName;
 	
 	private Crawler(Builder builder) {
 		this.needToDownloadImg = builder.needToDownloadImg;
@@ -30,6 +31,7 @@ public class Crawler {
 		this.imgPath = builder.imgPath;
 		this.excelStorePath = builder.excelStorePath;
 		this.downloadImageThreadNum = builder.downloadImageThreadNum;
+		this.excelFileName = builder.excelFileName;
 	}
 	/**
 	 * 爬取url的信息
@@ -111,7 +113,7 @@ public class Crawler {
 						return ;
 					}
 					System.out.println("开始保存");
-					boolean saveResult = ExcelUtil.getInstance(excelStorePath)
+					boolean saveResult = ExcelUtil.getInstance(excelStorePath, excelFileName)
 							.writeToExcel(courseList);
 					System.out.println(saveResult ? "保存完成" : "保存失败");
 				}
@@ -131,6 +133,7 @@ public class Crawler {
 		private String imgPath; //图片保存路径
 		private int downloadImageThreadNum; //下载图片的线程数
 		private String excelStorePath; //Excel保存路径
+		private String excelFileName; //Excel文件名
 		
 		public Builder(){
 			super();
@@ -163,6 +166,11 @@ public class Crawler {
 		
 		public Builder downloadImageThreadNum(int downloadImageThreadNum) {
 			this.downloadImageThreadNum = downloadImageThreadNum;
+			return this;
+		}
+		
+		public Builder excelFileName(String excelFileName) {
+			this.excelFileName = excelFileName;
 			return this;
 		}
 		
