@@ -3,6 +3,7 @@ package com.imooc.crawler.util;
 import java.io.File;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
 
@@ -21,7 +22,7 @@ public class FileUtil {
 	 * @return 路径
 	 */
 	public static String createDir(String insertedPath) {
-		String path = (null == insertedPath || insertedPath.isEmpty()) ? generateDefaultDirPath()
+		String path = (StringUtils.isEmpty(insertedPath)) ? generateDefaultDirPath()
                 : parseInsertedPath(insertedPath); //获取文件夹路径
 		File dir = new File(path);
 		if(!dir.exists()) {
@@ -59,9 +60,9 @@ public class FileUtil {
 	private static String parseInsertedPath(String insertedPath) {
 		insertedPath = StringEscapeUtils.escapeJava(insertedPath); //对转义字符进行反转义处理
 		//如果以/,//,\,\\结尾则不做处理
-		if(insertedPath.endsWith("/") ||insertedPath.endsWith("\\\\")
-				|| insertedPath.endsWith("\\")
-				|| insertedPath.endsWith("//")) {
+		if(StringUtils.endsWith(insertedPath, "/") || StringUtils.endsWith(insertedPath, "\\\\")
+				|| StringUtils.endsWith(insertedPath, "\\")
+				|| StringUtils.endsWith(insertedPath, "//")) {
 			return insertedPath;
 		}
 		if(insertedPath.contains("//")) {
@@ -86,9 +87,11 @@ public class FileUtil {
 	 * @return 处理后的文件名
 	 */
 	public static String removeIlleagalCharactersInFileName(String fileName) {
-		return fileName.replaceAll("\\\\", "").replaceAll(":", "").replaceAll("/", "")
-				.replaceAll("\\|", "").replaceAll("//*", "").replaceAll("//?", "")
-				.replaceAll("\"", "").replaceAll("<", "").replaceAll(">", "");
+		return StringUtils.replaceAll(fileName.toLowerCase().trim(), "[\\\\:/\\|//*//?\\<>\"]", "")
+				.replaceAll("con", "").replaceAll("prn", "").replaceAll("aux", "").replaceAll("clock$", "")
+				.replaceAll("nul", "").replaceAll("com1", "").replaceAll("com2", "").replaceAll("com3", "")
+				.replaceAll("com4", "").replaceAll("com5", "").replaceAll("com6", "").replaceAll("com7", "")
+				.replaceAll("com8", "").replaceAll("com9", "").replaceAll("lpt1", "");
 	}
 	
 	/**
@@ -97,8 +100,8 @@ public class FileUtil {
 	 * @return 文件的扩展名，带.
 	 */
 	public static String getFileExtName(String fileName) {
-		int lastDotIndex = fileName.lastIndexOf(".");
-		return (lastDotIndex >= 0) ? fileName.substring(lastDotIndex) : "";
+		int lastDotIndex = StringUtils.lastIndexOf(fileName, ".");
+		return (lastDotIndex >= 0) ? StringUtils.substring(fileName, lastDotIndex) : "";
 	}
 	
 	/**

@@ -60,9 +60,10 @@ public class HtmlParser {
 			host = uri.getHost();
 		} catch(Exception e) {
 			System.err.append("非法的URL").println();
+			e.printStackTrace();
 			return false;
 		}
-		return host.toLowerCase().contains("imooc.com");
+		return StringUtils.contains(StringUtils.lowerCase(host), "imooc.com");
 	}
 	
 	/**
@@ -84,7 +85,7 @@ public class HtmlParser {
 		List<ImoocCourse> courseList = new LinkedList<>();
 		courseList = Collections.synchronizedList(courseList);
 		int pageIndex = getLastEqualsIndex(TARGET_URL);
-		String fixedCourseUrl = TARGET_URL.substring(0, pageIndex); //获取不变的URL
+		String fixedCourseUrl = StringUtils.substring(TARGET_URL, 0, pageIndex); //获取不变的URL
 		int totalPages = getTotalPageNum();
 		if(totalPages == 0) {
 			return resultMap;
@@ -147,7 +148,7 @@ public class HtmlParser {
 	 * @return 最后一个等号的位置
 	 */
 	private int getLastEqualsIndex(String str) {
-		return str.lastIndexOf("=") + 1;
+		return StringUtils.lastIndexOf(str, "=") + 1;
 	}
 	
 	/**
@@ -159,8 +160,8 @@ public class HtmlParser {
 			Element lastPageElement = doc.select(".page a").last();
 			lastPageElement.getElementsByClass("active text-page-tag");
 			String lastPageHref = (lastPageElement.getElementsByClass("active text-page-tag").size() == 0) 
-					? doc.select(".page a").last().attr("href") : lastPageElement.text();
-			return Integer.parseInt(lastPageHref.substring(getLastEqualsIndex(lastPageHref)));
+					? lastPageElement.attr("href") : lastPageElement.text();
+			return Integer.parseInt(StringUtils.substring(lastPageHref, getLastEqualsIndex(lastPageHref)));
 		} catch(Exception e) {
 			e.printStackTrace();
 			return 0;

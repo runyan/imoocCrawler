@@ -7,6 +7,8 @@ import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Cleanup;
 /**
  * 下载工具类
@@ -57,6 +59,7 @@ public class DownloadUtil {
 	        conn.setRequestProperty("Connection", "Keep-Alive");
 			return conn;
 		} catch(Exception e) {
+			e.printStackTrace();
 			throw new RuntimeException("连接到" + url + "失败");
 		}
 	}
@@ -69,7 +72,7 @@ public class DownloadUtil {
 	public void downloadCourseImg(String courseName, String imgUrl) {
 		String storeDirPath = createImgStorageDir(); //课程图片存储路径
 		String suffix = FileUtil.getFileExtName(imgUrl); //图片扩展名
-		if(null == suffix || suffix.isEmpty() || !FileUtil.isLegalImageExt(suffix)) {
+		if(StringUtils.isEmpty(suffix) || !FileUtil.isLegalImageExt(suffix)) {
 			suffix = ".jpg";
 		}
 		courseName = FileUtil.removeIlleagalCharactersInFileName(courseName); //去除课程名中的非法字符

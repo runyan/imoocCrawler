@@ -1,11 +1,10 @@
 package com.imooc.crawler.util;
 
-import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import lombok.Cleanup;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -18,6 +17,7 @@ public class ExcelUtil {
 	private final String STORE_PATH;
 	private HSSFWorkbook workBook; //Excel工作簿
 	private HSSFSheet workSheet; //Excel工作表
+	private final String EXCEL_FILE_NAME = "courses.xls"; //Excel文件名
 	
 	private ExcelUtil(String storeDir){
 		this.STORE_PATH = storeDir;
@@ -30,11 +30,20 @@ public class ExcelUtil {
 	}
 	
 	/**
-	 * 创建存储的文件夹
+	 * 获取存储的文件夹的路径
 	 * @return 文件夹的路径
 	 */
 	private String getStorePath() {
 		return FileUtil.createDir(STORE_PATH);
+	}
+	
+	/**
+	 * 获取Excel文件
+	 * @return Excel文件
+	 */
+	private File getExcelFile() {
+		String excelFilePath = getStorePath().concat(EXCEL_FILE_NAME);
+		return new File(excelFilePath);
 	}
 
 	/**
@@ -51,6 +60,14 @@ public class ExcelUtil {
 	 * @return
 	 */
 	private HSSFWorkbook createWorkBook() {
+		File excelFile = getExcelFile();
+		//如果Excel文件已存在则删除
+		if(excelFile.exists()) {
+			boolean deleteResult = excelFile.delete();
+			if(!deleteResult) {
+				throw new RuntimeException("删除 " + excelFile.getAbsolutePath() + " 失败");
+			}
+		}
 		return new HSSFWorkbook();
 	}
 	
@@ -60,7 +77,7 @@ public class ExcelUtil {
 	 */
 	private HSSFSheet createWorkSheetAndAddHeader() {
 		workSheet = workBook.createSheet(); //创建工作表
-		workBook.setSheetName(0, "慕课网Java课程信息");
+		workBook.setSheetName(0, "慕课网Java课程信息"); //设置工作表的名称
 		HSSFRow headerRow = workSheet.createRow(0); //第一列，表头
 		HSSFCell cell = headerRow.createCell(0); //创表头建单元格，并填充内容
 		cell.setCellValue("课程名称");
@@ -96,16 +113,13 @@ public class ExcelUtil {
 			contentRow.createCell(0).setCellValue(course.getCourseName());
 			contentRow.createCell(1).setCellValue(course.getImgSrc());
 			contentRow.createCell(2).setCellValue(course.getCourseLevel());
-			contentRow.createCell(3).setCellValue(course.getCourseLabels().toString().replaceAll("\\[", "").replaceAll("\\]", ""));
+			contentRow.createCell(3).setCellValue(StringUtils.replaceAll(course.getCourseLabels().toString(), "[\\[\\]]", ""));
 			contentRow.createCell(4).setCellValue(course.getCourseDesc());
 			contentRow.createCell(5).setCellValue(course.getStudyNum());
 			contentRow.createCell(6).setCellValue(course.getCourseURL());
 		}
-		String fileName = "courses.xls"; //Excel文件名
-		String storePath = getStorePath().concat(fileName); //Excel文件存储路径
 		try {
-			@Cleanup FileOutputStream fos = new FileOutputStream(storePath);
-			workBook.write(fos); //将数据写入Excel文件
+			workBook.write(getExcelFile()); //将数据写入Excel文件
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
