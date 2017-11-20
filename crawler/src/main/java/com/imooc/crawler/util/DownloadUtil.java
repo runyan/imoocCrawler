@@ -16,14 +16,16 @@ import lombok.Cleanup;
 public class DownloadUtil {
 	
 	private final String INSERTED_IMG_STORE_PATH;
-	private final int DOWNLOAD_THREAD_COUNT = 3; //下载线程数
+	private final int DEFAULT_DOWNLOAD_THREAD_COUNT = 3; //默认下载线程数
+	private int downloadImageThreadNum;
 	
-	private DownloadUtil(String storeDir) {
+	private DownloadUtil(String storeDir, int downloadImageThreadNum) {
 		this.INSERTED_IMG_STORE_PATH = storeDir;
+		this.downloadImageThreadNum = (downloadImageThreadNum <= 0) ? DEFAULT_DOWNLOAD_THREAD_COUNT : downloadImageThreadNum;
 	}
 	
-	public static DownloadUtil getInstance(String storeDir) {
-		return new DownloadUtil(storeDir);
+	public static DownloadUtil getInstance(String storeDir, int downloadImageThreadNum) {
+		return new DownloadUtil(storeDir, downloadImageThreadNum);
 	}
 	
 	/**
@@ -87,10 +89,10 @@ public class DownloadUtil {
 			HttpURLConnection conn = getConnectionByUrl(imgUrl); 
 	        int fileSize = conn.getContentLength(); //得到文件大小
 	        conn.disconnect();
-	        int currentPartSize = fileSize / DOWNLOAD_THREAD_COUNT;
+	        int currentPartSize = fileSize / downloadImageThreadNum;
 	        int startPos;
 	        RandomAccessFile currentPart;
-	        for(int i = 0; i < DOWNLOAD_THREAD_COUNT; i++) {
+	        for(int i = 0; i < downloadImageThreadNum; i++) {
 	        	startPos = i * currentPartSize;
 	        	currentPart = new RandomAccessFile(targetFile, "rw");
 	        	currentPart.seek(startPos);

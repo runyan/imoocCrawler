@@ -21,6 +21,7 @@ public class Crawler {
 	private boolean print;
 	private String imgPath;
 	private String excelStorePath;
+	private int downloadImageThreadNum;
 	
 	private Crawler(Builder builder) {
 		this.needToDownloadImg = builder.needToDownloadImg;
@@ -28,6 +29,7 @@ public class Crawler {
 		this.print = builder.print;
 		this.imgPath = builder.imgPath;
 		this.excelStorePath = builder.excelStorePath;
+		this.downloadImageThreadNum = builder.downloadImageThreadNum;
 	}
 	/**
 	 * 爬取url的信息
@@ -81,7 +83,7 @@ public class Crawler {
 						return ;
 					}
 					System.out.println("开始下载");
-					DownloadUtil downloadUtil = DownloadUtil.getInstance(imgPath);
+					DownloadUtil downloadUtil = DownloadUtil.getInstance(imgPath, downloadImageThreadNum);
 					Set<Map.Entry<String, String>> imgUrlEntrySet = imgUrlMap.entrySet();
 					for(Map.Entry<String, String> imgUrlEntry : imgUrlEntrySet) {
 						downloadUtil.downloadCourseImg(imgUrlEntry.getKey(), imgUrlEntry.getValue());
@@ -127,6 +129,7 @@ public class Crawler {
 		private boolean needToStoreDataToExcel; //是否需要将数据保存到Excel
 		private boolean print = true; //是否需要打印数据
 		private String imgPath; //图片保存路径
+		private int downloadImageThreadNum; //下载图片的线程数
 		private String excelStorePath; //Excel保存路径
 		
 		public Builder(){
@@ -155,6 +158,11 @@ public class Crawler {
 		
 		public Builder print(boolean print) {
 			this.print = print;
+			return this;
+		}
+		
+		public Builder downloadImageThreadNum(int downloadImageThreadNum) {
+			this.downloadImageThreadNum = downloadImageThreadNum;
 			return this;
 		}
 		
