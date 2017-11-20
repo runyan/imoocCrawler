@@ -60,6 +60,7 @@ public class ExcelUtil {
 	 */
 	private HSSFSheet createWorkSheetAndAddHeader() {
 		workSheet = workBook.createSheet(); //创建工作表
+		workBook.setSheetName(0, "慕课网Java课程信息");
 		HSSFRow headerRow = workSheet.createRow(0); //第一列，表头
 		HSSFCell cell = headerRow.createCell(0); //创表头建单元格，并填充内容
 		cell.setCellValue("课程名称");
