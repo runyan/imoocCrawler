@@ -51,6 +51,10 @@ public class HtmlParser {
 	 * @return URL是否为慕课网的URL
 	 */
 	private static boolean checkHost(String targetUrl) {
+		if(StringUtils.isEmpty(targetUrl)) {
+			System.err.append("空的URL").println();
+			return false;
+		}
 		targetUrl = StringUtils.lowerCase(targetUrl);
 		String host;
 		String path;
