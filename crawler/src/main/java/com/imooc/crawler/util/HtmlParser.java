@@ -1,5 +1,6 @@
 package com.imooc.crawler.util;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,6 +32,9 @@ public class HtmlParser {
 	}
 	
 	public static HtmlParser getInstance(String url) {
+		if(!checkHost(url)) {
+			throw new RuntimeException("目前只可以爬取慕课网的课程信息");
+		}
 		if(null == instance) {
 			synchronized (HtmlParser.class) {
 				if(null == instance) {
@@ -38,6 +43,26 @@ public class HtmlParser {
 			}
 		}
 		return instance;
+	}
+	
+	/**
+	 * 检查传入的URL是否为慕课网的URL
+	 * @param url 要检测的URL
+	 * @return URL是否为慕课网的URL
+	 */
+	private static boolean checkHost(String url) {
+		String host;
+		if(!StringUtils.startsWithIgnoreCase(url, "http://") && !StringUtils.startsWithIgnoreCase(url, "https://")) {
+			url = "http://".concat(url);
+		}
+		try {
+			URL uri = new URL(url);
+			host = uri.getHost();
+		} catch(Exception e) {
+			System.err.append("非法的URL").println();
+			return false;
+		}
+		return host.contains("imooc.com");
 	}
 	
 	/**
