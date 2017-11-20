@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -76,6 +77,9 @@ public class DownloadUtil {
 			suffix = ".jpg";
 		}
 		courseName = FileUtil.removeIlleagalCharactersInFileName(courseName); //去除课程名中的非法字符
+		if(StringUtils.isEmpty(courseName)) {
+			courseName = StringUtils.replaceAll(UUID.randomUUID().toString(), "-", "");
+		}
 		String imageFileName = courseName.concat(suffix);
 		doDownload(imgUrl, imageFileName, storeDirPath);
 	}
