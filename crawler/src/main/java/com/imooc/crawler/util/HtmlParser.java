@@ -62,7 +62,7 @@ public class HtmlParser {
 			System.err.append("非法的URL").println();
 			return false;
 		}
-		return host.contains("imooc.com");
+		return host.toLowerCase().contains("imooc.com");
 	}
 	
 	/**
