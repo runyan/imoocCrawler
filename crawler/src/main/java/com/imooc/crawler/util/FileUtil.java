@@ -65,9 +65,10 @@ public class FileUtil {
 	 * 例：
 	 * 	输入D:/123,输出D:/123/
 	 *  输入123, 输出${系统生成路径}/123/
+	 *  输入123/folder, 输出${user.dir}/123/folder/
 	 */
 	private static String parseInsertedPath(String insertedPath) {
-		insertedPath = StringEscapeUtils.escapeJava(insertedPath); // 对转义字符进行反转义处理
+		insertedPath = removeWindowsReserveWordsInFileName(StringEscapeUtils.escapeJava(insertedPath)); // 对转义字符进行反转义处理
 		// 如果以/,//,\,\\结尾则不做处理
 		if (StringUtils.endsWith(insertedPath, "/")
 				|| StringUtils.endsWith(insertedPath, "\\\\")
@@ -98,10 +99,17 @@ public class FileUtil {
 	 * @return 处理后的文件名
 	 */
 	public static String removeIlleagalCharactersInFileName(String fileName) {
-		return StringUtils
-				.replaceAll(StringUtils.lowerCase(fileName).trim(),
-						"[\\\\:/\\|//*//?\\<>\"]", "").replaceAll("con", "")
-				.replaceAll("prn", "").replaceAll("aux", "")
+		String parsedFileName = StringUtils.replaceAll(StringUtils.lowerCase(fileName).trim(), "[\\\\:/\\|//*//?\\<>\"]", "");
+		return (OSUtil.isWindows()) ? removeWindowsReserveWordsInFileName(parsedFileName) : parsedFileName;
+	}
+	
+	/**
+	 * 移除文件名中的Windows系统保留字
+	 * @param fileName 文件名
+	 * @return 移除保留字后的文件名
+	 */
+	private static String removeWindowsReserveWordsInFileName(String fileName) {
+		return fileName.replaceAll("aux", "").replaceAll("con", "").replaceAll("prn", "")
 				.replaceAll("clock$", "").replaceAll("nul", "")
 				.replaceAll("com1", "").replaceAll("com2", "")
 				.replaceAll("com3", "").replaceAll("com4", "")
