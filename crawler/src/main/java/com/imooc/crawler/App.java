@@ -10,7 +10,7 @@ public class App {
     			.needToDownloadImg(true)
     			.imgPath("D://photos//imooc")
     			.needToStoreDataToExcel(true)
-    			.downloadImageThreadNum(5)
+    			.downloadImageThreadNum(1)
     			.excelFileName("imooc_courses")
     			.build();
     	crawler.crawImoocCourses("http://www.imooc.com/course/list?c=java&page=1");

@@ -24,10 +24,12 @@ public class HtmlParser {
 	
 	private volatile static HtmlParser instance = null;
 	private final String TARGET_URL;
+	private final HttpUtil HTTP_UTIL;
 	private Document doc;
 
 	private HtmlParser(String url){
 		this.TARGET_URL = url;
+		HTTP_UTIL = HttpUtil.getInstance();
 		doc = Jsoup.parse(getHtmlString(TARGET_URL));
 	}
 	
@@ -79,7 +81,7 @@ public class HtmlParser {
 	 * @return HTML源码
 	 */
 	private String getHtmlString(String url) {
-		return HttpUtil.getInstance().sendHttpGet(url);
+		return HTTP_UTIL.sendHttpGet(url);
 	}
 	
 	/**
@@ -110,7 +112,7 @@ public class HtmlParser {
 		String courseDesc;
 		String studyNum;
 		String immocURL = "http://www.imooc.com";
-		ImoocCourse c;
+		ImoocCourse course;
 		String htmlStr;
 		for(int pageNum = 1; pageNum <= totalPages; pageNum++) {
 			System.out.println("正在处理第" + pageNum + "页,还有" + (totalPages - pageNum) + "页");
@@ -123,22 +125,22 @@ public class HtmlParser {
 				doc = Jsoup.parse(htmlStr);
 			}
 			courseItems = doc.select(".container div .course-card-container");
-			for(Element course : courseItems) {
+			for(Element courseItem : courseItems) {
 				courseLabels = new ArrayList<>();
-				imgSrc = "http:".concat(course.getElementsByTag("img").attr("src"));
-				lableElements = course.select(".course-label label");
+				imgSrc = "http:".concat(courseItem.getElementsByTag("img").attr("src"));
+				lableElements = courseItem.select(".course-label label");
 				for(Element label : lableElements) {
 					courseLabel = label.text();
 					courseLabels.add(courseLabel);
 				}
-				courseName = course.getElementsByClass("course-card-name").text();
-				courseURL = immocURL.concat(course.select(".course-card").attr("href"));
-				courseInfoElements = course.select(".course-card-info span");
+				courseName = courseItem.getElementsByClass("course-card-name").text();
+				courseURL = immocURL.concat(courseItem.select(".course-card").attr("href"));
+				courseInfoElements = courseItem.select(".course-card-info span");
 				courseLevel = courseInfoElements.get(0).text();
 				studyNum = courseInfoElements.get(1).text();
-				courseDesc = course.getElementsByClass("course-card-desc").text();
-				c = new ImoocCourse(imgSrc, courseURL, courseName, courseLevel, courseLabels, courseDesc, studyNum); 
-				courseList.add(c);
+				courseDesc = courseItem.getElementsByClass("course-card-desc").text();
+				course = new ImoocCourse(imgSrc, courseURL, courseName, courseLevel, courseLabels, courseDesc, studyNum); 
+				courseList.add(course);
 				imgUrlMap.put(courseName, imgSrc);
 			}
 			urlBuilder.delete(pageIndex, urlBuilder.length());
@@ -165,7 +167,6 @@ public class HtmlParser {
 	private int getTotalPageNum() {
 		try {
 			Element lastPageElement = doc.select(".page a").last();
-			lastPageElement.getElementsByClass("active text-page-tag");
 			String lastPageHref = (lastPageElement.getElementsByClass("active text-page-tag").size() == 0) 
 					? lastPageElement.attr("href") : lastPageElement.text();
 			return Integer.parseInt(StringUtils.substring(lastPageHref, getLastEqualsIndex(lastPageHref)));
