@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,9 +38,9 @@ public class HtmlParser {
 		if(!checkHost(url)) {
 			throw new RuntimeException("目前只可以爬取慕课网的课程信息");
 		}
-		if(null == instance) {
+		if(Objects.isNull(instance)) {
 			synchronized (HtmlParser.class) {
-				if(null == instance) {
+				if(Objects.isNull(instance)) {
 					instance = new HtmlParser(url);
 				}
 			}

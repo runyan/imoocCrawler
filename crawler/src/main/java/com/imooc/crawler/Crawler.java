@@ -2,6 +2,7 @@ package com.imooc.crawler;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.imooc.crawler.entity.ImoocCourse;
 import com.imooc.crawler.util.DownloadUtil;
@@ -40,17 +41,24 @@ public class Crawler {
 	@SuppressWarnings("unchecked")
 	public void crawImoocCourses(String targetUrl) {
 		Map<String, Object> resultMap = HtmlParser.getInstance(targetUrl).parse(); //获取解析结果
-		if(null == resultMap || resultMap.isEmpty()) {
+		if(Objects.isNull(resultMap) || resultMap.isEmpty()) {
 			System.out.println("没有获取到数据");
 			return ;
 		}
 		Map<String, String> courseImgUrlMap = (Map<String, String>) resultMap.get("imgUrlMap");
 		List<ImoocCourse> courseList = (List<ImoocCourse>) resultMap.get("courseList");
-		printCourseInfo(courseList);
+		//如果需要打印课程信息，则打印课程信息，默认打印
+		if(print) {
+			printCourseInfo(courseList);
+		}
 		//如果需要下载图片则启动新线程进行下载
-		downloadImgs(courseImgUrlMap);
+		if(needToDownloadImg) {
+			downloadImgs(courseImgUrlMap);
+		}
 		//如果需要保存数据，则启动新线程进行保存
-		saveDataToExcel(courseList);
+		if(needToStoreDataToExcel) {
+			saveDataToExcel(courseList);
+		}
 	}
 	
 	/**
@@ -59,9 +67,7 @@ public class Crawler {
 	 * @param courseList 课程列表
 	 */
 	private void printCourseInfo(List<ImoocCourse> courseList) {
-		if(print) {
-			courseList.forEach(System.out::println);
-		}
+		courseList.forEach(System.out::println);
 	}
 	
 	/**
@@ -70,24 +76,22 @@ public class Crawler {
 	 * @param imgUrlMap 图片url集合
 	 */
 	private void downloadImgs(Map<String, String> imgUrlMap) {
-		if(needToDownloadImg) {
-			if(null == imgPath) {
-				imgPath = "";
-			}
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					if(null == imgUrlMap || imgUrlMap.isEmpty()) {
-						System.out.println("没有可以下载的数据");
-						return ;
-					}
-					System.out.println("开始下载");
-					DownloadUtil downloadUtil = DownloadUtil.getInstance(imgPath, downloadImageThreadNum);
-					imgUrlMap.forEach((courseName, imgURL) -> {downloadUtil.downloadCourseImg(courseName, imgURL);});
-					System.out.println("下载完成");
-				}
-			}).start();
+		if(null == imgPath) {
+			imgPath = "";
 		}
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				if(Objects.isNull(imgUrlMap) || imgUrlMap.isEmpty()) {
+					System.out.println("没有可以下载的数据");
+					return ;
+				}
+				System.out.println("开始下载");
+				DownloadUtil downloadUtil = DownloadUtil.getInstance(imgPath, downloadImageThreadNum);
+				imgUrlMap.forEach((courseName, imgURL) -> {downloadUtil.downloadCourseImg(courseName, imgURL);});
+				System.out.println("下载完成");
+			}
+		}).start();
 	}
 	
 	/**
@@ -95,24 +99,22 @@ public class Crawler {
 	 * @param courseList 课程列表
 	 */
 	private void saveDataToExcel(List<ImoocCourse> courseList) {
-		if(needToStoreDataToExcel) {
-			if(null == excelStorePath) {
-				excelStorePath = "";
-			}
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					if(null == courseList || courseList.isEmpty()) {
-						System.out.println("没有可以保存的数据");
-						return ;
-					}
-					System.out.println("开始保存");
-					boolean saveResult = ExcelUtil.getInstance(excelStorePath, excelFileName)
-							.writeToExcel(courseList);
-					System.out.println(saveResult ? "保存完成" : "保存失败");
-				}
-			}).start();
+		if(null == excelStorePath) {
+			excelStorePath = "";
 		}
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				if(Objects.isNull(courseList) || courseList.isEmpty()) {
+					System.out.println("没有可以保存的数据");
+					return ;
+				}
+				System.out.println("开始保存");
+				boolean saveResult = ExcelUtil.getInstance(excelStorePath, excelFileName)
+						.writeToExcel(courseList);
+				System.out.println(saveResult ? "保存完成" : "保存失败");
+			}
+		}).start();
 	}
 	
 	/**

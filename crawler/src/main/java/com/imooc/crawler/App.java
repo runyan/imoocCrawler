@@ -11,6 +11,7 @@ public class App {
     			.imgPath("D://photos//imooc")
     			.needToStoreDataToExcel(true)
     			.downloadImageThreadNum(1)
+    			.excelStorePath("123")
     			.excelFileName("imooc_courses")
     			.build();
     	crawler.crawImoocCourses("http://www.imooc.com/course/list?c=java&page=1");

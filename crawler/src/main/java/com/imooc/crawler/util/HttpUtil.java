@@ -1,5 +1,7 @@
 package com.imooc.crawler.util;
 
+import java.util.Objects;
+
 import lombok.Cleanup;
 
 import org.apache.http.HttpEntity;
@@ -23,9 +25,9 @@ public class HttpUtil {
     private HttpUtil(){} 
     
     public static HttpUtil getInstance(){  
-        if (null == instance) {  
+        if (Objects.isNull(instance)) {  
             synchronized (HttpUtil.class) {
-				if(null == instance) {
+				if(Objects.isNull(instance)) {
 					instance = new HttpUtil();
 				}
 			}  

@@ -15,6 +15,8 @@ import org.apache.commons.text.StringEscapeUtils;
 public class FileUtil {
 
 	private static final String SEPARATOR = File.separator;
+	private static final String USER_DIR = System.getProperty("user.dir");
+	private static final String IMOOC_CRAWLER_DIR = "imoocCrawler";
 
 	/**
 	 * 创建文件夹
@@ -46,11 +48,11 @@ public class FileUtil {
 		if (OSUtil.isWindows()) {
 			rootPath = "D:".concat(SEPARATOR);
 		} else if (OSUtil.isLinux() || OSUtil.isMacOS()) {
-			rootPath = System.getProperty("user.dir").concat(SEPARATOR);
+			rootPath = USER_DIR.concat(SEPARATOR);
 		} else {
 			throw new RuntimeException("暂不支持的操作系统");
 		}
-		String storeDirPath = "imoocCrawler".concat(SEPARATOR);
+		String storeDirPath = IMOOC_CRAWLER_DIR.concat(SEPARATOR);
 		return rootPath.concat(storeDirPath);
 	}
 
@@ -59,7 +61,10 @@ public class FileUtil {
 	 * 
 	 * @param insertedPath
 	 *            输入的文件路径
-	 * @return 处理后的文件路径 例：输入D:/123,输出d:/123/
+	 * @return 处理后的文件路径 
+	 * 例：
+	 * 	输入D:/123,输出D:/123/
+	 *  输入123, 输出${系统生成路径}/123/
 	 */
 	private static String parseInsertedPath(String insertedPath) {
 		insertedPath = StringEscapeUtils.escapeJava(insertedPath); // 对转义字符进行反转义处理
@@ -82,7 +87,7 @@ public class FileUtil {
 		if (StringUtils.contains(insertedPath, "\\")) {
 			return insertedPath.concat("\\");
 		}
-		throw new RuntimeException("非法的路径格式");
+		return generateDefaultDirPath().concat(SEPARATOR).concat(insertedPath).concat(SEPARATOR);
 	}
 
 	/**
