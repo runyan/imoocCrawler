@@ -2,7 +2,6 @@ package com.imooc.crawler;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.imooc.crawler.entity.ImoocCourse;
 import com.imooc.crawler.util.DownloadUtil;
@@ -46,7 +45,7 @@ public class Crawler {
 			return ;
 		}
 		Map<String, String> courseImgUrlMap = (Map<String, String>) resultMap.get("imgUrlMap");
-		List<ImoocCourse> courseList = (List<ImoocCourse>) resultMap.get("data");
+		List<ImoocCourse> courseList = (List<ImoocCourse>) resultMap.get("courseList");
 		printCourseInfo(courseList);
 		//如果需要下载图片则启动新线程进行下载
 		downloadImgs(courseImgUrlMap);
@@ -61,9 +60,7 @@ public class Crawler {
 	 */
 	private void printCourseInfo(List<ImoocCourse> courseList) {
 		if(print) {
-			for(ImoocCourse course : courseList) {
-				System.out.println(course);
-			}
+			courseList.forEach(System.out::println);
 		}
 	}
 	
@@ -86,10 +83,7 @@ public class Crawler {
 					}
 					System.out.println("开始下载");
 					DownloadUtil downloadUtil = DownloadUtil.getInstance(imgPath, downloadImageThreadNum);
-					Set<Map.Entry<String, String>> imgUrlEntrySet = imgUrlMap.entrySet();
-					for(Map.Entry<String, String> imgUrlEntry : imgUrlEntrySet) {
-						downloadUtil.downloadCourseImg(imgUrlEntry.getKey(), imgUrlEntry.getValue());
-					}
+					imgUrlMap.forEach((courseName, imgURL) -> {downloadUtil.downloadCourseImg(courseName, imgURL);});
 					System.out.println("下载完成");
 				}
 			}).start();

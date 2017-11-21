@@ -18,11 +18,13 @@ public class ExcelUtil {
 	private HSSFWorkbook workBook; //Excel工作簿
 	private HSSFSheet workSheet; //Excel工作表
 	private final String DEFAULT_EXCEL_FILE_NAME = "courses.xls"; //默认Excel文件名
-	private String excelFileName;
+	private final String EXCEL_FILE_NAME;
+	private final File EXCEL_FILE;
 	
 	private ExcelUtil(String storeDir, String excelFileName){
 		this.STORE_PATH = storeDir;
-		this.excelFileName = (StringUtils.isEmpty(excelFileName)) ? DEFAULT_EXCEL_FILE_NAME : FileUtil.parseExcelExt(excelFileName);
+		this.EXCEL_FILE_NAME = (StringUtils.isEmpty(excelFileName)) ? DEFAULT_EXCEL_FILE_NAME : FileUtil.parseExcelExt(excelFileName);
+		this.EXCEL_FILE = getExcelFile();
 		this.workBook = createWorkBook();
 		this.workSheet = createWorkSheetAndAddHeader();
 	}
@@ -44,7 +46,7 @@ public class ExcelUtil {
 	 * @return Excel文件
 	 */
 	private File getExcelFile() {
-		String excelFilePath = getStorePath().concat(excelFileName);
+		String excelFilePath = getStorePath().concat(EXCEL_FILE_NAME);
 		return new File(excelFilePath);
 	}
 
@@ -62,12 +64,11 @@ public class ExcelUtil {
 	 * @return
 	 */
 	private HSSFWorkbook createWorkBook() {
-		File excelFile = getExcelFile();
 		//如果Excel文件已存在则删除
-		if(excelFile.exists()) {
-			boolean deleteResult = excelFile.delete();
+		if(EXCEL_FILE.exists()) {
+			boolean deleteResult = EXCEL_FILE.delete();
 			if(!deleteResult) {
-				throw new RuntimeException("删除 " + excelFile.getAbsolutePath() + " 失败");
+				throw new RuntimeException("删除 " + EXCEL_FILE.getAbsolutePath() + " 失败");
 			}
 		}
 		return new HSSFWorkbook();
@@ -100,18 +101,17 @@ public class ExcelUtil {
 	
 	/**
 	 * 向Excel工作表中添加数据
-	 * @param courses
+	 * @param courseList
 	 * @return
 	 */
-	private boolean addContentToWorkSheet(List<ImoocCourse> courses) {
+	private boolean addContentToWorkSheet(List<ImoocCourse> courseList) {
 		int rowsInserted = 0;
-		int courseLength = courses.size();
+		int courseLength = courseList.size();
 		HSSFRow contentRow; //内容行
-		ImoocCourse course;
 		//循环添加行
-		for(; rowsInserted < courseLength; rowsInserted++) {
+		for(ImoocCourse course : courseList) {
 			contentRow = workSheet.createRow(rowsInserted + 1);
-			course = courses.get(rowsInserted);
+			course = courseList.get(rowsInserted);
 			contentRow.createCell(0).setCellValue(course.getCourseName());
 			contentRow.createCell(1).setCellValue(course.getImgSrc());
 			contentRow.createCell(2).setCellValue(course.getCourseLevel());
@@ -119,9 +119,10 @@ public class ExcelUtil {
 			contentRow.createCell(4).setCellValue(course.getCourseDesc());
 			contentRow.createCell(5).setCellValue(course.getStudyNum());
 			contentRow.createCell(6).setCellValue(course.getCourseURL());
+			rowsInserted++;
 		}
 		try {
-			workBook.write(getExcelFile()); //将数据写入Excel文件
+			workBook.write(EXCEL_FILE); //将数据写入Excel文件
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;

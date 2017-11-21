@@ -143,7 +143,7 @@ public class HtmlParser {
 			}
 			urlBuilder.delete(pageIndex, urlBuilder.length());
 		}
-		resultMap.put("data", courseList);
+		resultMap.put("courseList", courseList);
 		resultMap.put("imgUrlMap", imgUrlMap);
 		System.out.println("获取数据完成");
 		return resultMap;
