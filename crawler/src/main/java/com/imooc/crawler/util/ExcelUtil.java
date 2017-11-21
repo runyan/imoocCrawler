@@ -54,7 +54,7 @@ public class ExcelUtil {
 
 	/**
 	 * 保存到Excel
-	 * @param courses 要保存的课程列表
+	 * @param courseList 要保存的课程列表
 	 * @return 保存结果 true 成功, false 失败
 	 */
 	public boolean writeToExcel(List<ImoocCourse> courseList) {
