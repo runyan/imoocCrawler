@@ -23,10 +23,12 @@ public class ExcelUtil {
 	
 	private ExcelUtil(String storeDir, String excelFileName){
 		this.STORE_PATH = storeDir;
-		this.EXCEL_FILE_NAME = (StringUtils.isEmpty(excelFileName)) ? DEFAULT_EXCEL_FILE_NAME : FileUtil.parseExcelExt(excelFileName);
+		this.EXCEL_FILE_NAME = (StringUtils.isEmpty(excelFileName)) ? DEFAULT_EXCEL_FILE_NAME : 
+			FileUtil.parseExcelExt(FileUtil.removeIlleagalCharactersInFileName(excelFileName));
 		this.EXCEL_FILE = getExcelFile();
 		this.workBook = createWorkBook();
 		this.workSheet = createWorkSheetAndAddHeader();
+		System.out.println("Excel文件保存路径为:" + EXCEL_FILE.getAbsolutePath());
 	}
 	
 	public static ExcelUtil getInstance(String storeDir, String excelFileName) {
@@ -52,7 +54,7 @@ public class ExcelUtil {
 
 	/**
 	 * 保存到Excel
-	 * @param courseList 要保存的课程列表
+	 * @param courses 要保存的课程列表
 	 * @return 保存结果 true 成功, false 失败
 	 */
 	public boolean writeToExcel(List<ImoocCourse> courseList) {
