@@ -64,32 +64,13 @@ public class FileUtil {
 	 * @return 处理后的文件路径 
 	 * 例：
 	 * 	输入D:/123,输出D:/123/
-	 *  输入123, 输出${系统生成路径}/123/
-	 *  输入123/folder, 输出${user.dir}/123/folder/
+	 *  输入123/folder, 输出123/folder/
 	 */
 	private static String parseInsertedPath(String insertedPath) {
-		insertedPath = removeWindowsReserveWordsInFileName(StringEscapeUtils.escapeJava(insertedPath)); // 对转义字符进行反转义处理
-		// 如果以/,//,\,\\结尾则不做处理
-		if (StringUtils.endsWith(insertedPath, "/")
-				|| StringUtils.endsWith(insertedPath, "\\\\")
-				|| StringUtils.endsWith(insertedPath, "\\")
-				|| StringUtils.endsWith(insertedPath, "//")) {
-			return insertedPath;
-		}
-		if (StringUtils.contains(insertedPath, "//")) {
-			return insertedPath.concat("//");
-		}
-		if (StringUtils.contains(insertedPath, "/")) {
-			return insertedPath.concat("/");
-		}
-		if (StringUtils.contains(insertedPath, "\\\\")) {
-			return insertedPath.concat("\\\\");
-		}
-		if (StringUtils.contains(insertedPath, "\\")) {
-			return insertedPath.concat("\\");
-		}
-		return generateDefaultDirPath().concat(SEPARATOR).concat(insertedPath).concat(SEPARATOR);
+		insertedPath = StringEscapeUtils.escapeJava(insertedPath); // 对转义字符进行反转义处理
+		return removeIllegalCharactersInFilePath(unifyPathSeparator(insertedPath));
 	}
+	
 
 	/**
 	 * 移除文件名中的非法字符
@@ -101,6 +82,39 @@ public class FileUtil {
 	public static String removeIlleagalCharactersInFileName(String fileName) {
 		String parsedFileName = StringUtils.replaceAll(StringUtils.lowerCase(fileName).trim(), "[\\\\:/\\|//*//?\\<>\"]", "");
 		return (OSUtil.isWindows()) ? removeWindowsReserveWordsInFileName(parsedFileName) : parsedFileName;
+	}
+	
+	/**
+	 * 将输入的路径的分隔符替换成系统分隔符
+	 * @param path 文件路径
+	 * @return 替换后的文件路径
+	 */
+	private static String unifyPathSeparator(String path) {
+		String separator = unescapeSeparator();
+		return path.replaceAll("\\\\", separator).replaceAll("\\\\\\\\", separator).replaceAll("//", separator)
+				.replaceAll("/", separator);
+	}
+	
+	/**
+	 * 移除文件路径中的非法字符
+	 * @param path 文件路径
+	 * @return 处理后的文件路径
+	 */
+	private static String removeIllegalCharactersInFilePath(String path) {
+		String[] pathParts = path.split(unescapeSeparator()); //以分隔符拆分路径
+		StringBuilder pathBuilder = new StringBuilder();
+		for(String pathPart : pathParts) {
+			pathBuilder.append(removeIlleagalCharactersInFileName(pathPart)).append(SEPARATOR); //移除文件夹名称中的非法字符
+		}
+		return pathBuilder.toString();
+	}
+	
+	/**
+	 * 对文件分隔符进行转义
+	 * @return 转义后的分隔符
+	 */
+	private static String unescapeSeparator() {
+		return SEPARATOR.concat(SEPARATOR);
 	}
 	
 	/**

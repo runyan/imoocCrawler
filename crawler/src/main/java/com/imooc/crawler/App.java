@@ -34,11 +34,11 @@ public class App {
     	Crawler.Builder crawlerBuilder = new Crawler.Builder();
     	Crawler crawler = crawlerBuilder
     			.print(false)
-    			.needToDownloadImg(true)
+    			.needToDownloadImg(false)
     			.imgPath("D://photos//imooc")
     			.needToStoreDataToExcel(true)
     			.downloadImageThreadNum(5)
-    			.excelStorePath("d://com1//123")
+    			.excelStorePath("123//456")
     			.excelFileName("imooc_courses")
     			.build();
     	crawler.crawImoocCourses("http://www.imooc.com/course/list?c=java&page=1");
