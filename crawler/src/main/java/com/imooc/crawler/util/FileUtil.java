@@ -74,13 +74,13 @@ public class FileUtil {
 	}
 	
 	/**
-	 * 判断字符串是否以分隔符开始
-	 * @param str
+	 * 判断文件名是否以分隔符开始
+	 * @param fileName
 	 * @return
 	 */
-	private static boolean isStartsWithSeparator(String str) {
-		return StringUtils.startsWith(str, "\\\\") || StringUtils.startsWith(str, "\\") 
-				|| StringUtils.startsWith(str, "/") || StringUtils.startsWith(str, "//");
+	private static boolean isStartsWithSeparator(String fileName) {
+		return StringUtils.startsWith(fileName, "\\\\") || StringUtils.startsWith(fileName, "\\") 
+				|| StringUtils.startsWith(fileName, "/") || StringUtils.startsWith(fileName, "//");
 	}
 	
 
@@ -92,8 +92,22 @@ public class FileUtil {
 	 * @return 处理后的文件名
 	 */
 	public static String removeIlleagalCharactersInFileName(String fileName) {
-		String parsedFileName = StringUtils.replaceAll(StringUtils.lowerCase(fileName).trim(), "[\\\\:/\\|//*//?\\<>\"]", "");
+		String parsedFileName = StringUtils.replaceAll(StringUtils.lowerCase(fileName).trim(), "[\\\\:/\\|//*//?\\<>\"@#$￥&-()]", "");
+		parsedFileName = removeFirstDotsInFileName(parsedFileName); //去除文件名开始的.
+		parsedFileName = StringUtils.replaceAll(parsedFileName, "\\s*", ""); //去除文件名中的空格
 		return (OSUtil.isWindows()) ? removeWindowsReserveWordsInFileName(parsedFileName) : parsedFileName;
+	}
+	
+	/**
+	 * 移除文件名开始的.
+	 * @param fileName
+	 * @return
+	 */
+	private static String removeFirstDotsInFileName(String fileName) {
+		while(StringUtils.startsWith(fileName, ".")) {
+			fileName = StringUtils.replaceFirst(fileName, ".", "");
+		}
+		return fileName;
 	}
 	
 	/**
@@ -102,7 +116,7 @@ public class FileUtil {
 	 * @return 替换后的文件路径
 	 */
 	private static String unifyPathSeparator(String path) {
-		String separator = unescapeSeparator();
+		String separator = unescapeSeparator(); //对分隔符进行转义
 		return path.replaceAll("\\\\", separator).replaceAll("\\\\\\\\", separator).replaceAll("//", separator)
 				.replaceAll("/", separator).replaceAll("////", separator);
 	}
