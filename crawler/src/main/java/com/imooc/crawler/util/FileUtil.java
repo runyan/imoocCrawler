@@ -16,7 +16,6 @@ public class FileUtil {
 
 	private static final String SEPARATOR = File.separator;
 	private static final String USER_DIR = System.getProperty("user.dir");
-	private static final String IMOOC_CRAWLER_DIR = "imoocCrawler";
 
 	/**
 	 * 创建文件夹
@@ -44,16 +43,7 @@ public class FileUtil {
 	 * @return 自动生成的路径
 	 */
 	private static String generateDefaultDirPath() {
-		String rootPath;
-		if (OSUtil.isWindows()) {
-			rootPath = "D:".concat(SEPARATOR);
-		} else if (OSUtil.isLinux() || OSUtil.isMacOS()) {
-			rootPath = USER_DIR.concat(SEPARATOR);
-		} else {
-			throw new RuntimeException("暂不支持的操作系统");
-		}
-		String storeDirPath = IMOOC_CRAWLER_DIR.concat(SEPARATOR);
-		return rootPath.concat(storeDirPath);
+		return USER_DIR.concat(SEPARATOR);
 	}
 
 	/**
@@ -68,7 +58,29 @@ public class FileUtil {
 	 */
 	private static String parseInsertedPath(String insertedPath) {
 		insertedPath = StringEscapeUtils.escapeJava(insertedPath); // 对转义字符进行反转义处理
+		if(OSUtil.isWindows()) {
+			//处理Windows系统下用户输入 盘符:\路径的情况
+			if(StringUtils.contains(insertedPath, ":") && ':' == insertedPath.charAt(1)) {
+				String disc = StringUtils.substring(insertedPath, 0, 2);
+				String remain = removeIllegalCharactersInFilePath(unifyPathSeparator(StringUtils.substring(insertedPath, 2)));
+				return disc.concat(SEPARATOR).concat(remain);
+			}
+			//处理Windows系统下以分隔符开始的情况
+			if(isStartsWithSeparator(insertedPath)) {
+				return generateDefaultDirPath().concat(removeIllegalCharactersInFilePath(unifyPathSeparator(insertedPath)));
+			}
+		}
 		return removeIllegalCharactersInFilePath(unifyPathSeparator(insertedPath));
+	}
+	
+	/**
+	 * 判断字符串是否以分隔符开始
+	 * @param str
+	 * @return
+	 */
+	private static boolean isStartsWithSeparator(String str) {
+		return StringUtils.startsWith(str, "\\\\") || StringUtils.startsWith(str, "\\") 
+				|| StringUtils.startsWith(str, "/") || StringUtils.startsWith(str, "//");
 	}
 	
 
@@ -92,7 +104,7 @@ public class FileUtil {
 	private static String unifyPathSeparator(String path) {
 		String separator = unescapeSeparator();
 		return path.replaceAll("\\\\", separator).replaceAll("\\\\\\\\", separator).replaceAll("//", separator)
-				.replaceAll("/", separator);
+				.replaceAll("/", separator).replaceAll("////", separator);
 	}
 	
 	/**
