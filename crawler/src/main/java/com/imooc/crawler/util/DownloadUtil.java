@@ -60,6 +60,7 @@ public class DownloadUtil {
 	                        + "application/vnd.ms-powerpoint, application/msword, */*");
 	        conn.setRequestProperty("Charset", "UTF-8");
 	        conn.setRequestProperty("Connection", "Keep-Alive");
+	        conn.setRequestProperty("USER-AGENT", Constraints.USER_AGENT);
 			return conn;
 		} catch(Exception e) {
 			e.printStackTrace();
