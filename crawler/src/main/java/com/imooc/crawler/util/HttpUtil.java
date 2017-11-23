@@ -1,6 +1,7 @@
 package com.imooc.crawler.util;
 
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Objects;
 
 import lombok.Cleanup;
@@ -52,21 +53,26 @@ public class HttpUtil {
 		httpGet.setHeader("Connection", "Keep-Alive");
 		try {
 			CloseableHttpClient httpClient = HttpClientPoolUtil.getInstance().getHttpClient();
-			@Cleanup CloseableHttpResponse response = httpClient.execute(httpGet);
-			HttpEntity entity = response.getEntity();
-			responseContent = EntityUtils.toString(entity, "UTF-8");
-		} catch(Exception e) {
+			if(!Objects.isNull(httpClient)) {
+				@Cleanup CloseableHttpResponse response = httpClient.execute(httpGet);
+				HttpEntity entity = response.getEntity();
+				responseContent = EntityUtils.toString(entity, "UTF-8");
+			}
+		} catch(SocketTimeoutException e) {
 			// 服务器请求超时
-			if(e instanceof SocketTimeoutException) {
-				System.err.append("服务器请求超时").println();
-			}
+			System.err.append("服务器请求超时").println();
+			return "";
+		} catch(ConnectTimeoutException e) {
 			// 服务器响应超时(已经请求了)
-			if(e instanceof ConnectTimeoutException) {
-				System.err.append("服务器响应超时").println();
-			}
+			System.err.append("服务器响应超时").println();
+			return "";
+		} catch(UnknownHostException e) {
+			System.err.append("无网络连接或无法识别的主机").println();
+			return "";
+		} catch(Exception e) {
 			e.printStackTrace();
 			return "";
-		} 
+		}
 		return responseContent;
 	}
 

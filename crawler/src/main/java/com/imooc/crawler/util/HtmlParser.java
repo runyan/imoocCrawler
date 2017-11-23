@@ -31,7 +31,10 @@ public class HtmlParser {
 	private HtmlParser(String url){
 		this.TARGET_URL = url;
 		HTTP_UTIL = HttpUtil.getInstance();
-		doc = Jsoup.parse(getHtmlString(TARGET_URL));
+		String htmlString = getHtmlString(TARGET_URL);
+		if(!StringUtils.isEmpty(htmlString)) {
+			doc = Jsoup.parse(htmlString);
+		}
 	}
 	
 	public static HtmlParser getInstance(String url) {
@@ -167,12 +170,20 @@ public class HtmlParser {
 	 */
 	private int getTotalPageNum() {
 		try {
+			if(Objects.isNull(doc)) {
+				throw new RuntimeException("无法获取网页内容");
+			}
 			Element lastPageElement = doc.select(".page a").last();
 			String lastPageHref = (lastPageElement.getElementsByClass("active text-page-tag").size() == 0) 
 					? lastPageElement.attr("href") : lastPageElement.text();
 			return Integer.parseInt(StringUtils.substring(lastPageHref, getLastEqualsIndex(lastPageHref)));
 		} catch(Exception e) {
-			e.printStackTrace();
+			String message = e.getMessage();
+			if(StringUtils.equals(message, "无法获取网页内容")) {
+				System.err.append(message).println();
+			} else {
+				e.printStackTrace();
+			}
 			return 0;
 		}
 	}

@@ -3,6 +3,7 @@ package com.imooc.crawler.util;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.UnknownHostException;
+import java.util.Objects;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -47,9 +48,9 @@ public class HttpClientPoolUtil {
 	}
 	
 	public static HttpClientPoolUtil getInstance() {
-		if(null == instance) {
+		if(Objects.isNull(instance)) {
 			synchronized (LOCAL_LOCK) {
-				if(null == instance) {
+				if(Objects.isNull(instance)) {
 					instance = new HttpClientPoolUtil();
 				}
 			}
@@ -58,9 +59,9 @@ public class HttpClientPoolUtil {
 	}
 
 	private PoolingHttpClientConnectionManager getPoolManager() {
-		if (null == cm) {
+		if (Objects.isNull(cm)) {
 			synchronized (LOCAL_LOCK) {
-				if (null == cm) {
+				if (Objects.isNull(cm)) {
 					SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
 					try {
 						sslContextBuilder.loadTrustMaterial(null,
