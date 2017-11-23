@@ -46,9 +46,10 @@ public class DownloadUtil {
 	 * @return HttpURLConnection对象
 	 */
 	private HttpURLConnection getConnectionByUrl(String url) {
+		HttpURLConnection conn;
 		try {
 			URL targetUrl = new URL(url);
-			HttpURLConnection conn = (HttpURLConnection) targetUrl.openConnection();
+			conn = (HttpURLConnection) targetUrl.openConnection();
 	        conn.setConnectTimeout(Constraints.TIME_OUT);
 	        conn.setRequestMethod("GET");
 	        conn.setRequestProperty(
@@ -60,12 +61,12 @@ public class DownloadUtil {
 	                        + "application/vnd.ms-powerpoint, application/msword, */*");
 	        conn.setRequestProperty("Charset", "UTF-8");
 	        conn.setRequestProperty("Connection", "Keep-Alive");
-	        conn.setRequestProperty("USER-AGENT", Constraints.USER_AGENT);
-			return conn;
+	        conn.setRequestProperty("User-Agent", Constraints.USER_AGENT);
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("连接到" + url + "失败");
 		}
+		return conn;
 	}
 	
 	/**

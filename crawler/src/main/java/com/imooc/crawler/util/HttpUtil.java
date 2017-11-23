@@ -49,6 +49,7 @@ public class HttpUtil {
 		String responseContent = null;
 		httpGet.setConfig(requestConfig);
 		httpGet.setHeader("User-Agent", Constraints.USER_AGENT);
+		httpGet.setHeader("Connection", "Keep-Alive");
 		try {
 			CloseableHttpClient httpClient = HttpClientPoolUtil.getInstance().getHttpClient();
 			@Cleanup CloseableHttpResponse response = httpClient.execute(httpGet);
