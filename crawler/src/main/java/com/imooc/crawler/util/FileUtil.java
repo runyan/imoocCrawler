@@ -58,19 +58,43 @@ public class FileUtil {
 	 */
 	private static String parseInsertedPath(String insertedPath) {
 		insertedPath = StringEscapeUtils.escapeJava(insertedPath); // 对转义字符进行反转义处理
+		insertedPath = unifyPathSeparator(insertedPath); // 统一路径分隔符
 		if(OSUtil.isWindows()) {
 			//处理Windows系统下用户输入 盘符:\路径的情况
-			if(StringUtils.contains(insertedPath, ":") && ':' == insertedPath.charAt(1)) {
-				String disc = StringUtils.substring(insertedPath, 0, 2);
-				String remain = removeIllegalCharactersInFilePath(unifyPathSeparator(StringUtils.substring(insertedPath, 2)));
-				return disc.concat(SEPARATOR).concat(remain);
+			if(pathStartsWithWindowsDisc(insertedPath)) {
+				return handlePathContainsWindowsDisc(insertedPath);
 			}
 			//处理Windows系统下以分隔符开始的情况
 			if(isStartsWithSeparator(insertedPath)) {
-				return generateDefaultDirPath().concat(removeIllegalCharactersInFilePath(unifyPathSeparator(insertedPath)));
+				//处理路径为/盘符:/路径的情况
+				String subPath = StringUtils.substring(insertedPath, 1);
+				if(pathStartsWithWindowsDisc(subPath)) {
+					return handlePathContainsWindowsDisc(subPath);
+				}
+				return generateDefaultDirPath().concat(removeIllegalCharactersInFilePath(insertedPath));
 			}
 		}
-		return removeIllegalCharactersInFilePath(unifyPathSeparator(insertedPath));
+		return removeIllegalCharactersInFilePath(insertedPath);
+	}
+	
+	/**
+	 * 处理Windows系统下用户输入 盘符:/路径的情况
+	 * @param path
+	 * @return
+	 */
+	private static String handlePathContainsWindowsDisc(String path) {
+		String disc = StringUtils.substring(path, 0, 2);
+		String remain = removeIllegalCharactersInFilePath(StringUtils.substring(path, 2));
+		return disc.concat(SEPARATOR).concat(remain);
+	}
+	
+	/**
+	 * 判断路径是否为盘符:/路径的情况
+	 * @param path
+	 * @return
+	 */
+	private static boolean pathStartsWithWindowsDisc(String path) {
+		return StringUtils.contains(path, ":") && ':' == path.charAt(1);
 	}
 	
 	/**
