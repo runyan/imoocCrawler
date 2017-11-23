@@ -20,11 +20,13 @@ public class DownloadUtil {
 	
 	private final String INSERTED_IMG_STORE_PATH;
 	private final int DEFAULT_DOWNLOAD_THREAD_COUNT = 3; //默认下载线程数
+	private final int MAX_DOWNLOAD_THREAD_COUNT = 5; //最大下载线程数
 	private int downloadImageThreadNum;
 	
 	private DownloadUtil(String storeDir, int downloadImageThreadNum) {
 		this.INSERTED_IMG_STORE_PATH = storeDir;
-		this.downloadImageThreadNum = (downloadImageThreadNum <= 0) ? DEFAULT_DOWNLOAD_THREAD_COUNT : downloadImageThreadNum;
+		this.downloadImageThreadNum = (downloadImageThreadNum <= 0) ? DEFAULT_DOWNLOAD_THREAD_COUNT : 
+			(downloadImageThreadNum >= MAX_DOWNLOAD_THREAD_COUNT) ? MAX_DOWNLOAD_THREAD_COUNT : downloadImageThreadNum;
 	}
 	
 	public static DownloadUtil getInstance(String storeDir, int downloadImageThreadNum) {
