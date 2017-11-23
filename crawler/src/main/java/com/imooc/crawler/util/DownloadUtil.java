@@ -9,6 +9,8 @@ import java.net.URL;
 import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lombok.Cleanup;
 /**
@@ -22,11 +24,13 @@ public class DownloadUtil {
 	private final int DEFAULT_DOWNLOAD_THREAD_COUNT = 3; //默认下载线程数
 	private final int MAX_DOWNLOAD_THREAD_COUNT = 5; //最大下载线程数
 	private int downloadImageThreadNum;
+	private final Logger LOGGER;
 	
 	private DownloadUtil(String storeDir, int downloadImageThreadNum) {
 		this.INSERTED_IMG_STORE_PATH = storeDir;
 		this.downloadImageThreadNum = (downloadImageThreadNum <= 0) ? DEFAULT_DOWNLOAD_THREAD_COUNT : 
 			(downloadImageThreadNum >= MAX_DOWNLOAD_THREAD_COUNT) ? MAX_DOWNLOAD_THREAD_COUNT : downloadImageThreadNum;
+		this.LOGGER = LoggerFactory.getLogger(getClass());
 	}
 	
 	public static DownloadUtil getInstance(String storeDir, int downloadImageThreadNum) {
@@ -113,7 +117,7 @@ public class DownloadUtil {
 			e.printStackTrace();
 			System.err.append(imageFileName + "下载失败").println();
 		} 
-		System.out.println("已下载:" + imageFileName);
+		LOGGER.info("已下载:" + imageFileName);
 	}
 	
 	/**

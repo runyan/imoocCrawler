@@ -9,6 +9,8 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.imooc.crawler.entity.ImoocCourse;
 
@@ -20,6 +22,7 @@ public class ExcelUtil {
 	private final String DEFAULT_EXCEL_FILE_NAME = "courses.xls"; //默认Excel文件名
 	private final String EXCEL_FILE_NAME;
 	private final File EXCEL_FILE;
+	private final Logger LOGGER;
 	
 	private ExcelUtil(String storeDir, String excelFileName){
 		this.STORE_PATH = storeDir;
@@ -28,7 +31,8 @@ public class ExcelUtil {
 		this.EXCEL_FILE = getExcelFile();
 		this.workBook = createWorkBook();
 		this.workSheet = createWorkSheetAndAddHeader();
-		System.out.println("Excel文件保存路径为:" + EXCEL_FILE.getAbsolutePath());
+		LOGGER = LoggerFactory.getLogger(getClass());
+		LOGGER.info("Excel文件保存路径为:" + EXCEL_FILE.getAbsolutePath());
 	}
 	
 	public static ExcelUtil getInstance(String storeDir, String excelFileName) {
@@ -70,7 +74,9 @@ public class ExcelUtil {
 		if(EXCEL_FILE.exists()) {
 			boolean deleteResult = EXCEL_FILE.delete();
 			if(!deleteResult) {
-				throw new RuntimeException("删除 " + EXCEL_FILE.getAbsolutePath() + " 失败");
+				String message = "删除 " + EXCEL_FILE.getAbsolutePath() + " 失败";
+				LOGGER.error(message);
+				throw new RuntimeException(message);
 			}
 		}
 		return new HSSFWorkbook();
