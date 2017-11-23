@@ -1,5 +1,6 @@
 package com.imooc.crawler.util;
 
+import java.net.SocketTimeoutException;
 import java.util.Objects;
 
 import lombok.Cleanup;
@@ -8,10 +9,15 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+/**
+ * HttpClient工具类
+ * @author yanrun
+ *
+ */
 public class HttpUtil {
 	
 	private RequestConfig requestConfig = RequestConfig.custom()  
@@ -44,11 +50,19 @@ public class HttpUtil {
 		httpGet.setConfig(requestConfig);
 		httpGet.setHeader("User-Agent", Constraints.USER_AGENT);
 		try {
-			@Cleanup CloseableHttpClient httpClient = HttpClients.createDefault();
+			CloseableHttpClient httpClient = HttpClientPoolUtil.getInstance().getHttpClient();
 			@Cleanup CloseableHttpResponse response = httpClient.execute(httpGet);
 			HttpEntity entity = response.getEntity();
 			responseContent = EntityUtils.toString(entity, "UTF-8");
 		} catch(Exception e) {
+			// 服务器请求超时
+			if(e instanceof SocketTimeoutException) {
+				System.err.append("服务器请求超时").println();
+			}
+			// 服务器响应超时(已经请求了)
+			if(e instanceof ConnectTimeoutException) {
+				System.err.append("服务器响应超时").println();
+			}
 			e.printStackTrace();
 			return "";
 		} 
