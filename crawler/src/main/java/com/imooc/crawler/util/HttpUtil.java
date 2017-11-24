@@ -58,33 +58,30 @@ public class HttpUtil {
 	}
 
 	private String sendHttpGet(HttpGet httpGet) {
-		String responseContent = null;
 		httpGet.setConfig(requestConfig);
 		httpGet.setHeader("User-Agent", Constraints.USER_AGENT);
 		httpGet.setHeader("Connection", "Keep-Alive");
 		try {
 			CloseableHttpClient httpClient = HttpClientPoolUtil.getInstance().getHttpClient();
+			String responseContent = "";
 			if(!Objects.isNull(httpClient)) {
 				@Cleanup CloseableHttpResponse response = httpClient.execute(httpGet);
 				HttpEntity entity = response.getEntity();
 				responseContent = EntityUtils.toString(entity, "UTF-8");
 			}
+			return responseContent;
 		} catch(SocketTimeoutException e) {
 			// 服务器请求超时
 			log.error("服务器请求超时");
-			return "";
 		} catch(ConnectTimeoutException e) {
 			// 服务器响应超时(已经请求了)
 			log.error("服务器响应超时");
-			return "";
 		} catch(UnknownHostException e) {
 			log.error("无网络连接或无法识别的主机");
-			return "";
 		} catch(Exception e) {
 			log.error(e.getMessage());
-			return "";
 		}
-		return responseContent;
+		return "";
 	}
 
 }
