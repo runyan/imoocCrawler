@@ -113,7 +113,7 @@ public class DownloadUtil {
 	        }
 		} catch(Exception e) {
 			e.printStackTrace();
-			System.err.append(imageFileName + "下载失败").println();
+			log.error(imageFileName + "下载失败");
 		} 
 		log.info("已下载:" + imageFileName);
 	}

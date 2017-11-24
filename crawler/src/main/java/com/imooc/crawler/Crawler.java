@@ -87,7 +87,7 @@ public class Crawler {
 			@Override
 			public void run() {
 				if(Objects.isNull(imgUrlMap) || imgUrlMap.isEmpty()) {
-					System.out.println("没有可以下载的数据");
+					log.info("没有可以下载的数据");
 					return ;
 				}
 				log.info("开始下载");

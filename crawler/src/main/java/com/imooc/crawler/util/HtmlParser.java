@@ -53,7 +53,7 @@ public class HtmlParser {
 	 */
 	private static boolean checkHost(String targetUrl) {
 		if(StringUtils.isEmpty(targetUrl)) {
-			System.err.append("空的URL").println();
+			log.error("空的URL");
 			return false;
 		}
 		targetUrl = StringUtils.lowerCase(targetUrl);
@@ -67,7 +67,7 @@ public class HtmlParser {
 			host = url.getHost();
 			path = url.getPath();
 		} catch(Exception e) {
-			System.err.append("非法的URL").println();
+			log.error("非法的URL");
 			e.printStackTrace();
 			return false;
 		}
