@@ -8,10 +8,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 /**
  * 下载工具类
  * @author yanrun

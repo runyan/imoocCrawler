@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +29,7 @@ public class Crawler {
 	private String excelStorePath;
 	private int downloadImageThreadNum;
 	private String excelFileName;
+	private ExecutorService threadPool = Executors.newCachedThreadPool();
 	
 	private Crawler(Builder builder) {
 		this.needToDownloadImg = builder.needToDownloadImg;
@@ -63,6 +66,7 @@ public class Crawler {
 		if(needToStoreDataToExcel) {
 			saveDataToExcel(courseList);
 		}
+		threadPool.shutdown();
 	}
 	
 	/**
@@ -71,7 +75,12 @@ public class Crawler {
 	 * @param courseList 课程列表
 	 */
 	private void printCourseInfo(List<ImoocCourse> courseList) {
-		courseList.forEach((course) -> log.info(course.toString()));
+		threadPool.execute(new Runnable() {
+			@Override
+			public void run() {
+				courseList.forEach((course) -> log.info(course.toString()));
+			}
+		});
 	}
 	
 	/**
@@ -83,7 +92,7 @@ public class Crawler {
 		if(null == imgPath) {
 			imgPath = "";
 		}
-		new Thread(new Runnable() {
+		threadPool.execute(new Thread(new Runnable() {
 			@Override
 			public void run() {
 				if(Objects.isNull(imgUrlMap) || imgUrlMap.isEmpty()) {
@@ -95,7 +104,7 @@ public class Crawler {
 				imgUrlMap.forEach((courseName, imgURL) -> {downloadUtil.downloadCourseImg(courseName, imgURL);});
 				log.info("下载完成");
 			}
-		}).start();
+		}));
 	}
 	
 	/**
@@ -106,7 +115,7 @@ public class Crawler {
 		if(null == excelStorePath) {
 			excelStorePath = "";
 		}
-		new Thread(new Runnable() {
+		threadPool.execute(new Thread(new Runnable() {
 			@Override
 			public void run() {
 				if(Objects.isNull(courseList) || courseList.isEmpty()) {
@@ -118,7 +127,7 @@ public class Crawler {
 						.writeToExcel(courseList);
 				log.info(saveResult ? "保存完成" : "保存失败");
 			}
-		}).start();
+		}));
 	}
 	
 	/**
