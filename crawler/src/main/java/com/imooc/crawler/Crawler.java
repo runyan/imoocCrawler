@@ -1,11 +1,11 @@
 package com.imooc.crawler;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.imooc.crawler.entity.ImoocCourse;
 import com.imooc.crawler.util.DownloadUtil;
@@ -17,6 +17,7 @@ import com.imooc.crawler.util.HtmlParser;
  * @author yanrun
  *
  */
+@Slf4j
 public class Crawler {
 	
 	private boolean needToDownloadImg;
@@ -26,7 +27,6 @@ public class Crawler {
 	private String excelStorePath;
 	private int downloadImageThreadNum;
 	private String excelFileName;
-	private final Logger LOGGER;
 	
 	private Crawler(Builder builder) {
 		this.needToDownloadImg = builder.needToDownloadImg;
@@ -36,7 +36,6 @@ public class Crawler {
 		this.excelStorePath = builder.excelStorePath;
 		this.downloadImageThreadNum = builder.downloadImageThreadNum;
 		this.excelFileName = builder.excelFileName;
-		this.LOGGER = LoggerFactory.getLogger(getClass());
 	}
 	/**
 	 * 爬取url的信息
@@ -47,7 +46,7 @@ public class Crawler {
 	public void crawImoocCourses(String targetUrl) {
 		Map<String, Object> resultMap = HtmlParser.getInstance(targetUrl).parse(); //获取解析结果
 		if(Objects.isNull(resultMap) || resultMap.isEmpty()) {
-			LOGGER.info("没有获取到数据");
+			log.info("没有获取到数据");
 			return ;
 		}
 		Map<String, String> courseImgUrlMap = (Map<String, String>) resultMap.get("imgUrlMap");
@@ -72,7 +71,7 @@ public class Crawler {
 	 * @param courseList 课程列表
 	 */
 	private void printCourseInfo(List<ImoocCourse> courseList) {
-		courseList.forEach((course) -> LOGGER.info(course.toString()));
+		courseList.forEach((course) -> log.info(course.toString()));
 	}
 	
 	/**
@@ -91,10 +90,10 @@ public class Crawler {
 					System.out.println("没有可以下载的数据");
 					return ;
 				}
-				LOGGER.info("开始下载");
+				log.info("开始下载");
 				DownloadUtil downloadUtil = DownloadUtil.getInstance(imgPath, downloadImageThreadNum);
 				imgUrlMap.forEach((courseName, imgURL) -> {downloadUtil.downloadCourseImg(courseName, imgURL);});
-				LOGGER.info("下载完成");
+				log.info("下载完成");
 			}
 		}).start();
 	}
@@ -111,13 +110,13 @@ public class Crawler {
 			@Override
 			public void run() {
 				if(Objects.isNull(courseList) || courseList.isEmpty()) {
-					LOGGER.info("没有可以保存的数据");
+					log.info("没有可以保存的数据");
 					return ;
 				}
-				LOGGER.info("开始保存");
+				log.info("开始保存");
 				boolean saveResult = ExcelUtil.getInstance(excelStorePath, excelFileName)
 						.writeToExcel(courseList);
-				LOGGER.info(saveResult ? "保存完成" : "保存失败");
+				log.info(saveResult ? "保存完成" : "保存失败");
 			}
 		}).start();
 	}

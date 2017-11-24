@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.imooc.crawler.entity.ImoocCourse;
 /**
@@ -23,12 +23,12 @@ import com.imooc.crawler.entity.ImoocCourse;
  * @author yanrun
  *
  */
+@Slf4j
 public class HtmlParser {
 	
 	private final String TARGET_URL;
 	private final HttpUtil HTTP_UTIL;
 	private Document doc;
-	private final Logger LOGGER;
 
 	private HtmlParser(String url){
 		this.TARGET_URL = url;
@@ -37,7 +37,6 @@ public class HtmlParser {
 		if(!StringUtils.isEmpty(htmlString)) {
 			doc = Jsoup.parse(htmlString);
 		}	
-		this.LOGGER = LoggerFactory.getLogger(getClass());
 	}
 	
 	public static HtmlParser getInstance(String url) {
@@ -115,7 +114,7 @@ public class HtmlParser {
 		ImoocCourse course;
 		String htmlStr;
 		for(int pageNum = 1; pageNum <= totalPages; pageNum++) {
-			LOGGER.info("正在处理第" + pageNum + "页,还有" + (totalPages - pageNum) + "页");
+			log.info("正在处理第" + pageNum + "页,还有" + (totalPages - pageNum) + "页");
 			urlBuilder = urlBuilder.append(pageNum);
 			if(pageNum >= 2) {
 				htmlStr = getHtmlString(urlBuilder.toString());
@@ -147,7 +146,7 @@ public class HtmlParser {
 		}
 		resultMap.put("courseList", courseList);
 		resultMap.put("imgUrlMap", imgUrlMap);
-		LOGGER.info("获取数据完成");
+		log.info("获取数据完成");
 		return resultMap;
 	}
 	
@@ -176,7 +175,7 @@ public class HtmlParser {
 		} catch(Exception e) {
 			String message = e.getMessage();
 			if(StringUtils.equals(message, "无法获取网页内容")) {
-				LOGGER.error(message);
+				log.error(message);
 			} else {
 				e.printStackTrace();
 			}

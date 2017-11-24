@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.Objects;
 
 import lombok.Cleanup;
+import lombok.extern.slf4j.Slf4j;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -13,17 +14,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * HttpClient工具类
  * @author yanrun
  *
  */
+@Slf4j
 public class HttpUtil {
-	
-	private Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	private RequestConfig requestConfig = RequestConfig.custom()  
             .setSocketTimeout(Constraints.TIME_OUT)  
@@ -73,17 +71,17 @@ public class HttpUtil {
 			}
 		} catch(SocketTimeoutException e) {
 			// 服务器请求超时
-			LOGGER.error("服务器请求超时");
+			log.error("服务器请求超时");
 			return "";
 		} catch(ConnectTimeoutException e) {
 			// 服务器响应超时(已经请求了)
-			LOGGER.error("服务器响应超时");
+			log.error("服务器响应超时");
 			return "";
 		} catch(UnknownHostException e) {
-			LOGGER.error("无网络连接或无法识别的主机");
+			log.error("无网络连接或无法识别的主机");
 			return "";
 		} catch(Exception e) {
-			LOGGER.error(e.getMessage());
+			log.error(e.getMessage());
 			return "";
 		}
 		return responseContent;
