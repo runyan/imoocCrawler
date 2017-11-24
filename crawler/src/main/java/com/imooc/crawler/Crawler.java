@@ -92,7 +92,7 @@ public class Crawler {
 		if(null == imgPath) {
 			imgPath = "";
 		}
-		threadPool.execute(new Thread(new Runnable() {
+		threadPool.execute(new Runnable() {
 			@Override
 			public void run() {
 				if(Objects.isNull(imgUrlMap) || imgUrlMap.isEmpty()) {
@@ -104,7 +104,7 @@ public class Crawler {
 				imgUrlMap.forEach((courseName, imgURL) -> {downloadUtil.downloadCourseImg(courseName, imgURL);});
 				log.info("下载完成");
 			}
-		}));
+		});
 	}
 	
 	/**
@@ -115,7 +115,7 @@ public class Crawler {
 		if(null == excelStorePath) {
 			excelStorePath = "";
 		}
-		threadPool.execute(new Thread(new Runnable() {
+		threadPool.execute(new Runnable() {
 			@Override
 			public void run() {
 				if(Objects.isNull(courseList) || courseList.isEmpty()) {
@@ -127,7 +127,7 @@ public class Crawler {
 						.writeToExcel(courseList);
 				log.info(saveResult ? "保存完成" : "保存失败");
 			}
-		}));
+		});
 	}
 	
 	/**
