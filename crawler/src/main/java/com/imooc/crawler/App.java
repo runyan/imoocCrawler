@@ -33,7 +33,7 @@ public class App {
 	public static void main( String[] args ) throws IOException {
     	Crawler.Builder crawlerBuilder = new Crawler.Builder();
     	Crawler crawler = crawlerBuilder
-    			.print(true)
+    			.print(false)
     			.needToDownloadImg(true)
     			.imgPath("D://photos//.imooc")
     			.needToStoreDataToExcel(true)

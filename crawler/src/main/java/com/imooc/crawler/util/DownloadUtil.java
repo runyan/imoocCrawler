@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
@@ -105,12 +106,14 @@ public class DownloadUtil {
 	        int currentPartSize = fileSize / downloadImageThreadNum;
 	        int startPos;
 	        RandomAccessFile currentPart;
+	        CountDownLatch countDownLatch = new CountDownLatch(downloadImageThreadNum);
 	        for(int i = 0; i < downloadImageThreadNum; i++) {
 	        	startPos = i * currentPartSize;
 	        	currentPart = new RandomAccessFile(targetFile, "rw");
 	        	currentPart.seek(startPos);
-	        	new DownloadThread(startPos, currentPartSize, currentPart, imgUrl).start();
+	        	new DownloadThread(startPos, currentPartSize, currentPart, imgUrl, countDownLatch).start();
 	        }
+	        countDownLatch.await();
 		} catch(Exception e) {
 			e.printStackTrace();
 			log.error(imageFileName + "下载失败");
@@ -130,14 +133,16 @@ public class DownloadUtil {
 		private String downloadUrl; //要下载的文件的URL
 		private RandomAccessFile currentPart; //当前线程需要下载的文件块
 		private int length; //已经该线程已下载的字节数
+		private CountDownLatch countDownLatch;
 		
 		public DownloadThread(int startPos, int currentPartSize,
-				RandomAccessFile currentPart, String downloadUrl) {
+				RandomAccessFile currentPart, String downloadUrl, CountDownLatch countDownLatch) {
 			super();
 			this.startPos = startPos;
 			this.currentPartSize = currentPartSize;
 			this.currentPart = currentPart;
 			this.downloadUrl = downloadUrl;
+			this.countDownLatch = countDownLatch;
 		}
 
 		@Override
@@ -160,6 +165,7 @@ public class DownloadUtil {
 			} finally {
 				try {
 					currentPart.close();
+					countDownLatch.countDown();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
