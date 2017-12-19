@@ -3,11 +3,11 @@ package com.imooc.crawler.util;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +29,8 @@ public class HtmlParser {
 	private final String TARGET_URL;
 	private final HttpUtil HTTP_UTIL;
 	private Document doc;
+	private ThreadLocal<Map<String, String>> imgUrlThreadLocal;
+	private ThreadLocal<Map<String, Object>> parseResultThreadLocal;
 
 	private HtmlParser(String url){
 		this.TARGET_URL = url;
@@ -37,6 +39,10 @@ public class HtmlParser {
 		if(!StringUtils.isEmpty(htmlString)) {
 			doc = Jsoup.parse(htmlString);
 		}	
+		imgUrlThreadLocal = new ThreadLocal<>();
+		imgUrlThreadLocal.set(new HashMap<>());
+		parseResultThreadLocal = new ThreadLocal<>();
+		parseResultThreadLocal.set(new HashMap<>());
 	}
 	
 	public static HtmlParser getInstance(String url) {
@@ -88,8 +94,8 @@ public class HtmlParser {
 	 * @return 解析获得的数据
 	 */
 	public Map<String, Object> parse() {
-		Map<String, Object> resultMap = new ConcurrentHashMap<>();
-		Map<String, String> imgUrlMap = new ConcurrentHashMap<>();
+		Map<String, Object> resultMap = parseResultThreadLocal.get();
+		Map<String, String> imgUrlMap = imgUrlThreadLocal.get();
 		List<ImoocCourse> courseList = new LinkedList<>();
 		courseList = Collections.synchronizedList(courseList);
 		int pageIndex = getLastEqualsIndex(TARGET_URL);
@@ -169,7 +175,7 @@ public class HtmlParser {
 				throw new RuntimeException("无法获取网页内容");
 			}
 			Element lastPageElement = doc.select(".page a").last();
-			String lastPageHref = (lastPageElement.getElementsByClass("active text-page-tag").size() == 0) 
+			String lastPageHref = (lastPageElement.getElementsByClass("active text-page-tag").isEmpty()) 
 					? lastPageElement.attr("href") : lastPageElement.text();
 			return Integer.parseInt(StringUtils.substring(lastPageHref, getLastEqualsIndex(lastPageHref)));
 		} catch(Exception e) {
