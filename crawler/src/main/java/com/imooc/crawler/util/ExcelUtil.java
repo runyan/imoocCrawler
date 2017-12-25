@@ -14,6 +14,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import com.imooc.crawler.entity.ImoocCourse;
 
+@Deprecated
 @Slf4j
 public class ExcelUtil {
 

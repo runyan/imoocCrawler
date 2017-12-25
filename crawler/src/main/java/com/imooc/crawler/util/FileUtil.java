@@ -217,6 +217,7 @@ public class FileUtil {
 	 * @return 处理后的Excel文件名
 	 */
 	public static String parseExcelExt(String excelFileName) {
+		excelFileName = removeIlleagalCharactersInFileName(excelFileName);
 		String fileExt = getFileExt(excelFileName);
 		String xlsx = ".xlsx";
 		String xls = ".xls";

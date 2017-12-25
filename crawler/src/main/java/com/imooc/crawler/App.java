@@ -34,7 +34,7 @@ public class App {
     	Crawler.Builder crawlerBuilder = new Crawler.Builder();
     	Crawler crawler = crawlerBuilder
     			.print(false)
-    			.needToDownloadImg(true)
+    			.needToDownloadImg(false)
     			.imgPath("D://photos//.imooc")
     			.needToStoreDataToExcel(true)
     			.downloadImageThreadNum(5)

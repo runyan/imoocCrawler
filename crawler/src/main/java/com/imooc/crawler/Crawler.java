@@ -1,5 +1,6 @@
 package com.imooc.crawler;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -9,10 +10,13 @@ import java.util.concurrent.Executors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.imooc.crawler.entity.ImoocCourse;
 import com.imooc.crawler.util.DownloadUtil;
-import com.imooc.crawler.util.ExcelUtil;
+import com.imooc.crawler.util.FileUtil;
 import com.imooc.crawler.util.HtmlParser;
+import com.xuxueli.poi.excel.ExcelExportUtil;
 
 /**
  * 爬虫类
@@ -38,7 +42,8 @@ public class Crawler {
 		this.imgPath = builder.imgPath;
 		this.excelStorePath = builder.excelStorePath;
 		this.downloadImageThreadNum = builder.downloadImageThreadNum;
-		this.excelFileName = builder.excelFileName;
+		this.excelFileName = StringUtils.isEmpty(builder.excelFileName) ? "courses.xls" : 
+			FileUtil.parseExcelExt(builder.excelFileName); 
 	}
 	/**
 	 * 爬取url的信息
@@ -123,9 +128,17 @@ public class Crawler {
 					return ;
 				}
 				log.info("开始保存");
-				boolean saveResult = ExcelUtil.getInstance(excelStorePath, excelFileName)
-						.writeToExcel(courseList);
-				log.info(saveResult ? "保存完成" : "保存失败");
+				String excelFilePath = FileUtil.createDir(excelStorePath);
+				String excelFile = excelFilePath.concat(excelFileName);
+				File excel = new File(excelFile);
+				if(excel.exists()) {
+					boolean deleteOldExcelFileResult = excel.delete();
+					if(!deleteOldExcelFileResult) {
+						log.error("出现异常");
+					}
+				}
+				ExcelExportUtil.exportToFile(courseList, excelFile);
+				log.info("保存完成");
 			}
 		});
 	}

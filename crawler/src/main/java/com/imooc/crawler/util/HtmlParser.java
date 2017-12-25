@@ -144,7 +144,7 @@ public class HtmlParser {
 				courseLevel = courseInfoElements.get(0).text();
 				studyNum = courseInfoElements.get(1).text();
 				courseDesc = courseItem.getElementsByClass("course-card-desc").text();
-				course = new ImoocCourse(imgSrc, courseURL, courseName, courseLevel, courseLabels, courseDesc, studyNum); 
+				course = new ImoocCourse(courseName, imgSrc, courseURL, courseLevel, courseLabels, courseDesc, studyNum); 
 				courseList.add(course);
 				imgUrlMap.put(courseName, imgSrc);
 			}
