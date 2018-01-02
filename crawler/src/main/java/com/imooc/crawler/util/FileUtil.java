@@ -16,7 +16,7 @@ public class FileUtil {
 
 	private static final String SEPARATOR = File.separator;
 	private static final String USER_DIR = System.getProperty("user.dir");
-
+	
 	/**
 	 * 创建文件夹
 	 * 
@@ -129,7 +129,7 @@ public class FileUtil {
 	 */
 	private static String removeFirstDotsInFileName(String fileName) {
 		while(StringUtils.startsWith(fileName, ".")) {
-			fileName = StringUtils.replaceFirst(fileName, ".", "");
+			fileName = StringUtils.replaceFirst(fileName, ".", StringUtils.EMPTY);
 		}
 		return fileName;
 	}
@@ -173,13 +173,13 @@ public class FileUtil {
 	 * @return 移除保留字后的文件名
 	 */
 	private static String removeWindowsReserveWordsInFileName(String fileName) {
-		return fileName.replaceAll("aux", "").replaceAll("con", "").replaceAll("prn", "")
-				.replaceAll("clock$", "").replaceAll("nul", "")
-				.replaceAll("com1", "").replaceAll("com2", "")
-				.replaceAll("com3", "").replaceAll("com4", "")
-				.replaceAll("com5", "").replaceAll("com6", "")
-				.replaceAll("com7", "").replaceAll("com8", "")
-				.replaceAll("com9", "").replaceAll("lpt1", "");
+		return fileName.replaceAll("aux", StringUtils.EMPTY).replaceAll("con", StringUtils.EMPTY).replaceAll("prn", StringUtils.EMPTY)
+				.replaceAll("clock$", StringUtils.EMPTY).replaceAll("nul", StringUtils.EMPTY)
+				.replaceAll("com1", StringUtils.EMPTY).replaceAll("com2", StringUtils.EMPTY)
+				.replaceAll("com3", StringUtils.EMPTY).replaceAll("com4", StringUtils.EMPTY)
+				.replaceAll("com5", StringUtils.EMPTY).replaceAll("com6", StringUtils.EMPTY)
+				.replaceAll("com7", StringUtils.EMPTY).replaceAll("com8", StringUtils.EMPTY)
+				.replaceAll("com9", StringUtils.EMPTY).replaceAll("lpt1", StringUtils.EMPTY);
 	}
 
 	/**
@@ -193,7 +193,7 @@ public class FileUtil {
 		fileName = StringUtils.lowerCase(fileName);
 		int lastDotIndex = StringUtils.lastIndexOf(fileName, ".");
 		return (lastDotIndex >= 0) ? StringUtils.substring(fileName,
-				lastDotIndex) : "";
+				lastDotIndex) : StringUtils.EMPTY;
 	}
 
 	/**

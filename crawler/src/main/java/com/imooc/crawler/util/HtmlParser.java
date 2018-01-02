@@ -170,9 +170,10 @@ public class HtmlParser {
 	 * @return 页数
 	 */
 	private int getTotalPageNum() {
+		String errorMsg = "无法获取网页内容";
 		try {
 			if(Objects.isNull(doc)) {
-				throw new RuntimeException("无法获取网页内容");
+				throw new RuntimeException(errorMsg);
 			}
 			Element lastPageElement = doc.select(".page a").last();
 			String lastPageHref = (lastPageElement.getElementsByClass("active text-page-tag").isEmpty()) 
@@ -180,7 +181,7 @@ public class HtmlParser {
 			return Integer.parseInt(StringUtils.substring(lastPageHref, getLastEqualsIndex(lastPageHref)));
 		} catch(Exception e) {
 			String message = e.getMessage();
-			if(StringUtils.equals(message, "无法获取网页内容")) {
+			if(StringUtils.equals(message, errorMsg)) {
 				log.error(message);
 			} else {
 				e.printStackTrace();
