@@ -153,6 +153,8 @@ public class HtmlParser {
 		resultMap.put("courseList", courseList);
 		resultMap.put("imgUrlMap", imgUrlMap);
 		log.info("获取数据完成");
+		parseResultThreadLocal.remove();
+		imgUrlThreadLocal.remove();
 		return resultMap;
 	}
 	
