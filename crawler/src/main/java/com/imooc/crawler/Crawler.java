@@ -43,6 +43,7 @@ public class Crawler {
 		this.downloadImageThreadNum = builder.downloadImageThreadNum;
 		this.excelFileName = StringUtils.isEmpty(builder.excelFileName) ? "courses.xls" : 
 			FileUtil.parseExcelExt(builder.excelFileName); 
+		threadPool = Executors.newCachedThreadPool();
 	}
 	/**
 	 * 爬取url的信息
@@ -56,7 +57,6 @@ public class Crawler {
 			log.info("没有获取到数据");
 			return ;
 		}
-		threadPool = Executors.newCachedThreadPool();
 		Map<String, String> courseImgUrlMap = (Map<String, String>) resultMap.get("imgUrlMap");
 		List<ImoocCourse> courseList = (List<ImoocCourse>) resultMap.get("courseList");
 		//如果需要打印课程信息，则打印课程信息，默认打印
@@ -148,7 +148,7 @@ public class Crawler {
 	 * @author yanrun
 	 *
 	 */
-	public static class Builder {
+	public static final class Builder {
 		private boolean needToDownloadImg; //是否需要下载图片
 		private boolean needToStoreDataToExcel; //是否需要将数据保存到Excel
 		private boolean print = true; //是否需要打印数据
