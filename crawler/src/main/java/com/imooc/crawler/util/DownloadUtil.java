@@ -107,11 +107,17 @@ public class DownloadUtil {
 	        int startPos;
 	        RandomAccessFile currentPart;
 	        CountDownLatch countDownLatch = new CountDownLatch(downloadImageThreadNum);
+	        DownloadTask downloadTask;
+	        java.util.concurrent.FutureTask<Void> task;
+	        Thread downloadThread;
 	        for(int i = 0; i < downloadImageThreadNum; i++) {
 	        	startPos = i * currentPartSize;
 	        	currentPart = new RandomAccessFile(targetFile, "rw");
 	        	currentPart.seek(startPos);
-	        	new DownloadThread(startPos, currentPartSize, currentPart, imgUrl, countDownLatch).start();
+	        	downloadTask = new DownloadTask(startPos, currentPartSize, currentPart, imgUrl, countDownLatch);
+	        	task = new java.util.concurrent.FutureTask<Void>(downloadTask);
+	        	downloadThread = new Thread(task);
+	        	downloadThread.start();
 	        }
 	        countDownLatch.await();
 		} catch(Exception e) {
@@ -126,7 +132,7 @@ public class DownloadUtil {
 	 * @author yanrun
 	 *
 	 */
-	private class DownloadThread extends Thread {
+	private class DownloadTask implements java.util.concurrent.Callable<Void> {
 		
 		private int startPos; //当前线程的下载位置
 		private int currentPartSize; //当前线程负责下载的文件大小
@@ -135,7 +141,7 @@ public class DownloadUtil {
 		private int length; //已经该线程已下载的字节数
 		private CountDownLatch countDownLatch;
 		
-		public DownloadThread(int startPos, int currentPartSize,
+		public DownloadTask(int startPos, int currentPartSize,
 				RandomAccessFile currentPart, String downloadUrl, CountDownLatch countDownLatch) {
 			super();
 			this.startPos = startPos;
@@ -146,7 +152,7 @@ public class DownloadUtil {
 		}
 
 		@Override
-		public void run() {
+		public Void call() throws Exception {
 			HttpURLConnection conn = null;
 			try {
 				conn = getConnectionByUrl(downloadUrl);
@@ -170,6 +176,8 @@ public class DownloadUtil {
 					e.printStackTrace();
 				}
 			}
+			return null;
 		}
+		
 	}
 }
