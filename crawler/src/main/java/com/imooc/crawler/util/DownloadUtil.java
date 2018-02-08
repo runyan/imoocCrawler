@@ -8,6 +8,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
@@ -99,6 +101,7 @@ public class DownloadUtil {
 	 */
 	private void doDownload(String imgUrl, String imageFileName, String storePath) {
 		File targetFile = new File(storePath, imageFileName);
+		ExecutorService threadPool = Executors.newFixedThreadPool(downloadImageThreadNum);
 		try {
 			HttpURLConnection conn = getConnectionByUrl(imgUrl); 
 	        int fileSize = conn.getContentLength(); //得到文件大小
@@ -108,22 +111,20 @@ public class DownloadUtil {
 	        RandomAccessFile currentPart;
 	        CountDownLatch countDownLatch = new CountDownLatch(downloadImageThreadNum);
 	        DownloadTask downloadTask;
-	        java.util.concurrent.FutureTask<Void> task;
-	        Thread downloadThread;
 	        for(int i = 0; i < downloadImageThreadNum; i++) {
 	        	startPos = i * currentPartSize;
 	        	currentPart = new RandomAccessFile(targetFile, "rw");
 	        	currentPart.seek(startPos);
 	        	downloadTask = new DownloadTask(startPos, currentPartSize, currentPart, imgUrl, countDownLatch);
-	        	task = new java.util.concurrent.FutureTask<Void>(downloadTask);
-	        	downloadThread = new Thread(task);
-	        	downloadThread.start();
+	        	threadPool.submit(downloadTask);
 	        }
 	        countDownLatch.await();
 		} catch(Exception e) {
 			e.printStackTrace();
 			log.error(imageFileName + "下载失败");
-		} 
+		} finally {
+			threadPool.shutdown();
+		}
 		log.info("已下载:" + imageFileName);
 	}
 	
@@ -166,14 +167,19 @@ public class DownloadUtil {
 		        	currentPart.write(buffer, 0, hasRead);
 		        	length += hasRead; //累计该线程下载的总大小
 		        }
+			} catch (IOException e) {
+				e.printStackTrace();
+				log.error("流处理错误");
 			} catch(Exception e) {
 				e.printStackTrace();
+				log.error("下载时出错");
 			} finally {
 				try {
 					currentPart.close();
 					countDownLatch.countDown();
 				} catch (IOException e) {
 					e.printStackTrace();
+					log.error("关闭临时文件时出错");
 				}
 			}
 			return null;
