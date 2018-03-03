@@ -1,4 +1,4 @@
-package com.imooc.crawler;
+package com.imooc.crawler.crawler;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,11 @@ public class Crawler {
 	private String excelStorePath;
 	private int downloadImageThreadNum;
 	private String excelFileName;
+	private String targetUrl;
 	private ExecutorService threadPool;
+	
+	private String DEFAULT_EXCEL_FILE_NAME = "courses.xls";
+	
 	private Crawler(Builder builder) {
 		this.needToDownloadImg = builder.needToDownloadImg;
 		this.needToStoreDataToExcel = builder.needToStoreDataToExcel;
@@ -41,8 +45,13 @@ public class Crawler {
 		this.imgPath = builder.imgPath;
 		this.excelStorePath = builder.excelStorePath;
 		this.downloadImageThreadNum = builder.downloadImageThreadNum;
-		this.excelFileName = StringUtils.isEmpty(builder.excelFileName) ? "courses.xls" : 
+		this.excelFileName = StringUtils.isEmpty(builder.excelFileName) ? DEFAULT_EXCEL_FILE_NAME : 
 			FileUtil.parseExcelExt(builder.excelFileName); 
+		if(StringUtils.isEmpty(builder.targetUrl)) {
+			log.error("空的Url");
+			throw new RuntimeException("empty target url");
+		}
+		this.targetUrl = builder.targetUrl;
 		threadPool = Executors.newCachedThreadPool();
 	}
 	/**
@@ -51,7 +60,7 @@ public class Crawler {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	public void crawImoocCourses(String targetUrl) {
+	public void crawImoocCourses() {
 		Map<String, Object> resultMap = HtmlParser.getInstance(targetUrl).parse(); //获取解析结果
 		if(Objects.isNull(resultMap) || resultMap.isEmpty()) {
 			log.info("没有获取到数据");
@@ -156,6 +165,7 @@ public class Crawler {
 		private int downloadImageThreadNum; //下载图片的线程数
 		private String excelStorePath; //Excel保存路径
 		private String excelFileName; //Excel文件名
+		private String targetUrl; //目标URL
 		
 		public Builder(){
 			super();
@@ -193,6 +203,11 @@ public class Crawler {
 		
 		public Builder excelFileName(String excelFileName) {
 			this.excelFileName = excelFileName;
+			return this;
+		}
+		
+		public Builder targetUrl(String targetUrl) {
+			this.targetUrl = targetUrl;
 			return this;
 		}
 		
