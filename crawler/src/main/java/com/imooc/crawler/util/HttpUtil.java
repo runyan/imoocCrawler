@@ -7,13 +7,13 @@ import java.util.Objects;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.http.HttpEntity;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
 
 /**
  * HttpClient工具类
@@ -53,6 +53,11 @@ public class HttpUtil {
     	}
     }
 	
+    /**
+     * 发送GET请求
+     * @param url 目标URL
+     * @return
+     */
 	public String sendHttpGet(String url) {
 		return sendHttpGet(new HttpGet(url));
 	}
@@ -63,13 +68,13 @@ public class HttpUtil {
 		httpGet.setHeader("Connection", "Keep-Alive");
 		try {
 			CloseableHttpClient httpClient = HttpClientPoolUtil.getInstance().getHttpClient();
-			String responseContent = "";
+			String responseBody = "";
 			if(!Objects.isNull(httpClient)) {
 				@Cleanup CloseableHttpResponse response = httpClient.execute(httpGet);
-				HttpEntity entity = response.getEntity();
-				responseContent = EntityUtils.toString(entity, "UTF-8");
+				ResponseHandler<String> responseHandler = new BasicResponseHandler();  
+				responseBody = httpClient.execute(httpGet, responseHandler);
 			}
-			return responseContent;
+			return responseBody;
 		} catch(SocketTimeoutException e) {
 			// 服务器请求超时
 			log.error("服务器请求超时");

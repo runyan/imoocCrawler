@@ -153,7 +153,7 @@ public class DownloadUtil {
 		}
 
 		@Override
-		public Void call() throws Exception {
+		public Void call() {
 			HttpURLConnection conn = null;
 			try {
 				conn = getConnectionByUrl(downloadUrl);
