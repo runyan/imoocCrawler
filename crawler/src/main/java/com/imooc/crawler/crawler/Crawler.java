@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.imooc.crawler.entity.ImoocCourse;
+import com.imooc.crawler.factory.ThreadFactory;
 import com.imooc.crawler.util.DownloadUtil;
 import com.imooc.crawler.util.FileUtil;
 import com.imooc.crawler.util.HtmlParser;
@@ -31,10 +31,9 @@ public class Crawler {
 	private boolean print;
 	private String imgPath;
 	private String excelStorePath;
-	private int downloadImageThreadNum;
 	private String excelFileName;
 	private String targetUrl;
-	private ExecutorService threadPool;
+	private ThreadPoolExecutor threadPool;
 	
 	private String DEFAULT_EXCEL_FILE_NAME = "courses.xls";
 	
@@ -44,7 +43,6 @@ public class Crawler {
 		this.print = builder.print;
 		this.imgPath = builder.imgPath;
 		this.excelStorePath = builder.excelStorePath;
-		this.downloadImageThreadNum = builder.downloadImageThreadNum;
 		this.excelFileName = StringUtils.isEmpty(builder.excelFileName) ? DEFAULT_EXCEL_FILE_NAME : 
 			FileUtil.parseExcelExt(builder.excelFileName); 
 		if(StringUtils.isEmpty(builder.targetUrl)) {
@@ -52,7 +50,7 @@ public class Crawler {
 			throw new RuntimeException("empty target url");
 		}
 		this.targetUrl = builder.targetUrl;
-		threadPool = Executors.newCachedThreadPool();
+		threadPool = ThreadFactory.getThreadPool();
 	}
 	/**
 	 * 爬取url的信息
@@ -114,7 +112,7 @@ public class Crawler {
 					return ;
 				}
 				log.info("开始下载");
-				DownloadUtil downloadUtil = DownloadUtil.getInstance(imgPath, downloadImageThreadNum);
+				DownloadUtil downloadUtil = DownloadUtil.getInstance(imgPath);
 				imgUrlMap.forEach((courseName, imgURL) -> {downloadUtil.downloadCourseImg(courseName, imgURL);});
 				log.info("下载完成");
 			}
@@ -162,7 +160,6 @@ public class Crawler {
 		private boolean needToStoreDataToExcel; //是否需要将数据保存到Excel
 		private boolean print = true; //是否需要打印数据
 		private String imgPath; //图片保存路径
-		private int downloadImageThreadNum; //下载图片的线程数
 		private String excelStorePath; //Excel保存路径
 		private String excelFileName; //Excel文件名
 		private String targetUrl; //目标URL
@@ -193,11 +190,6 @@ public class Crawler {
 		
 		public Builder print(boolean print) {
 			this.print = print;
-			return this;
-		}
-		
-		public Builder downloadImageThreadNum(int downloadImageThreadNum) {
-			this.downloadImageThreadNum = downloadImageThreadNum;
 			return this;
 		}
 		

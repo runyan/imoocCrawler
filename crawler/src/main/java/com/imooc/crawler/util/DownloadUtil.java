@@ -8,13 +8,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.imooc.crawler.factory.ThreadFactory;
 /**
  * 下载工具类
  * @author yanrun
@@ -24,18 +25,14 @@ import org.apache.commons.lang3.StringUtils;
 public class DownloadUtil {
 	
 	private final String INSERTED_IMG_STORE_PATH;
-	private final int DEFAULT_DOWNLOAD_THREAD_COUNT = 3; //默认下载线程数
-	private final int MAX_DOWNLOAD_THREAD_COUNT = 5; //最大下载线程数
-	private int downloadImageThreadNum;
+	private static final int downloadImageThreadNum = 5;
 	
-	private DownloadUtil(String storeDir, int downloadImageThreadNum) {
+	private DownloadUtil(String storeDir) {
 		this.INSERTED_IMG_STORE_PATH = storeDir;
-		this.downloadImageThreadNum = (downloadImageThreadNum <= 0) ? DEFAULT_DOWNLOAD_THREAD_COUNT : 
-			(downloadImageThreadNum >= MAX_DOWNLOAD_THREAD_COUNT) ? MAX_DOWNLOAD_THREAD_COUNT : downloadImageThreadNum;
 	}
 	
-	public static DownloadUtil getInstance(String storeDir, int downloadImageThreadNum) {
-		return new DownloadUtil(storeDir, downloadImageThreadNum);
+	public static DownloadUtil getInstance(String storeDir) {
+		return new DownloadUtil(storeDir);
 	}
 	
 	/**
@@ -101,7 +98,7 @@ public class DownloadUtil {
 	 */
 	private void doDownload(String imgUrl, String imageFileName, String storePath) {
 		File targetFile = new File(storePath, imageFileName);
-		ExecutorService threadPool = Executors.newFixedThreadPool(downloadImageThreadNum);
+		ThreadPoolExecutor threadPool = ThreadFactory.getThreadPool();
 		try {
 			HttpURLConnection conn = getConnectionByUrl(imgUrl); 
 	        int fileSize = conn.getContentLength(); //得到文件大小

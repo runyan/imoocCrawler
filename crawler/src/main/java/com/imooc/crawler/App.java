@@ -40,7 +40,6 @@ public class App {
     			.needToDownloadImg(true)
     			.imgPath("D://photos//.imooc")
     			.needToStoreDataToExcel(true)
-    			.downloadImageThreadNum(5)
     			.excelStorePath("//D:\\111")
     			.excelFileName("课程")
     			.build();
